@@ -1,6 +1,6 @@
 package com.bg.commons.utils;
 
-import com.bg.commons.constant.BgConsts;
+import com.bg.commons.constant.BgConsants;
 import com.bg.commons.exception.BusinessException;
 import com.vladsch.flexmark.ast.Node;
 import com.vladsch.flexmark.ext.tables.TablesExtension;
@@ -10,20 +10,13 @@ import com.vladsch.flexmark.parser.ParserEmulationProfile;
 import com.vladsch.flexmark.util.options.MutableDataSet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
-import org.springframework.lang.NonNull;
-import org.springframework.util.StringUtils;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
-
-import javax.imageio.IIOImage;
-import javax.imageio.ImageIO;
-import javax.imageio.ImageWriteParam;
-import javax.imageio.ImageWriter;
-import javax.imageio.stream.ImageOutputStream;
 import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.file.Files;
@@ -32,6 +25,17 @@ import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.UUID;
+import javax.imageio.IIOImage;
+import javax.imageio.ImageIO;
+import javax.imageio.ImageWriteParam;
+import javax.imageio.ImageWriter;
+import javax.imageio.stream.ImageOutputStream;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
+import org.springframework.lang.NonNull;
+import org.springframework.util.StringUtils;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 /**
  * 公用工具类
@@ -76,7 +80,7 @@ public class BgUtil {
    * 禁止实例化
    */
   private BgUtil() {
-    throw new BusinessException("Constructor not allow");
+    throw BusinessException.build("Constructor not allow");
   }
 
   /**
@@ -153,9 +157,9 @@ public class BgUtil {
    * @return 截取的预览字符串
    */
   public static String getSummary(String content) {
-    int index = BgUtil.ignoreCaseIndexOf(content, BgConsts.PREVIEW_FLAG);
+    int index = BgUtil.ignoreCaseIndexOf(content, BgConsants.PREVIEW_FLAG);
     if (-1 == index) {
-      index = content.length() > BgConsts.MAX_PREVIEW_COUNT ? BgConsts.MAX_PREVIEW_COUNT : content.length();
+      index = content.length() > BgConsants.MAX_PREVIEW_COUNT ? BgConsants.MAX_PREVIEW_COUNT : content.length();
     }
     return content.substring(0, index);
   }
@@ -246,7 +250,7 @@ public class BgUtil {
    * @return 项目目录文件
    */
   public static Path getFameDir() {
-    Path dir = Paths.get(BgConsts.USER_HOME, BgConsts.BG_HOME);
+    Path dir = Paths.get(BgConsants.USER_HOME, BgConsants.BG_HOME);
     if (!Files.exists(dir)) {
       try {
         Files.createDirectories(dir);

@@ -55,7 +55,7 @@ public class SimpleGeneratorHandler {
 
   public static void generateSimple(SimpleGeneratorConfig config) throws Exception {
     if (config == null) {
-      throw new BusinessException("配置不能为空");
+      throw BusinessException.build("配置不能为空");
     }
     boolean generateController = config.isGenerateController();
     boolean generateService = config.isGenerateService();
@@ -69,7 +69,7 @@ public class SimpleGeneratorHandler {
     String author = config.getAuthor();
     String moduleName = config.getModuleName();
     if (StringUtils.isBlank(name)) {
-      throw new BusinessException("名称不能为空");
+      throw BusinessException.build("名称不能为空");
     }
     String camelName = name.substring(0, 1).toLowerCase() + name.substring(1);
     String projectDir = System.getProperty(USER_DIR);
@@ -166,16 +166,16 @@ public class SimpleGeneratorHandler {
 
   public static void render(String templateName, Map<String, Object> params, String outFileDirPath, String outFileName) throws Exception {
     if (StringUtils.isBlank(templateName)) {
-      throw new BusinessException("模板名称不能为空");
+      throw BusinessException.build("模板名称不能为空");
     }
     if (MapUtils.isEmpty(params)) {
-      throw new BusinessException("模板参数不能为空");
+      throw BusinessException.build("模板参数不能为空");
     }
     if (StringUtils.isBlank(outFileDirPath)) {
-      throw new BusinessException("文件输出目录路径不能为空");
+      throw BusinessException.build("文件输出目录路径不能为空");
     }
     if (StringUtils.isBlank(outFileName)) {
-      throw new BusinessException("文件输出名称不能为空");
+      throw BusinessException.build("文件输出名称不能为空");
     }
     File outFieDir = new File(outFileDirPath);
     if (!outFieDir.exists()) {

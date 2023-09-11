@@ -3,7 +3,7 @@ package com.bg.commons.constant;
 /**
  * 公共常量
  *
- * @author haseochen
+ * @author jiewus
  */
 public interface CommonConstant {
 
@@ -11,6 +11,7 @@ public interface CommonConstant {
    * 请求的原始字符串
    */
   String REQUEST_PARAM_BODY_STRING = "REQUEST_PARAM_BODY_STRING";
+
   String PACKAGE_NAME = "com.bg";
 
   /**
@@ -83,5 +84,17 @@ public interface CommonConstant {
   /**
    * 1000
    */
-  int ONE_THOUSAND = 1000;
+  Integer ONE_THOUSAND = 1000;
+
+  /**
+   * 成功常量int类型
+   */
+  Integer SUCCESS_INT = 1;
+
+  /**
+   * 失败常量int类型
+   */
+  Integer FAIL_INT = 0;
+
+
 }

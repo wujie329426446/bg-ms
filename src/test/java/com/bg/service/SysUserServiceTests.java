@@ -1,26 +1,33 @@
 package com.bg.service;
 
+import com.alibaba.fastjson2.JSON;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.bg.system.param.UserPageParam;
 import com.bg.system.service.SysUserService;
+import com.bg.system.vo.SysUserVo;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest
+@Slf4j
 public class SysUserServiceTests {
 
   @Autowired
   private SysUserService sysUserService;
 
   @Test
-  public void resetUser() {
-    sysUserService.resetUser("bg", "bg", "329426446@qq.com");
+  public void selectUserByUsername() {
+    String bg = sysUserService.selectUserByUsername("bg").toString();
+    log.info("bg:{}", bg);
   }
 
   @Test
-  public void selectUserByUsername() {
-    System.out.println(sysUserService.selectUserByUsername("bg").toString());
+  public void getUserPageList() {
+    UserPageParam userPageParam = new UserPageParam();
+    Page<SysUserVo> userPageList = sysUserService.getPageList(userPageParam);
+    log.info("userPageList: {}", JSON.toJSONString(userPageList));
   }
+
 }

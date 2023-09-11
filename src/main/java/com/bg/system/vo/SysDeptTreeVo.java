@@ -20,7 +20,7 @@ import java.util.List;
 @Data
 @Accessors(chain = true)
 @Schema(description = "部门")
-public class SysDepartmentTreeVo implements Serializable {
+public class SysDeptTreeVo implements Serializable {
 
   @Serial
   private static final long serialVersionUID = -2250233632748939400L;
@@ -35,7 +35,7 @@ public class SysDepartmentTreeVo implements Serializable {
   private String parentId;
 
   @Schema(description = "状态，0：禁用，1：启用")
-  private Integer state;
+  private Integer status;
 
   @Schema(description = "排序")
   private Integer sort;
@@ -54,6 +54,6 @@ public class SysDepartmentTreeVo implements Serializable {
   @Schema(description = "修改时间")
   private LocalDateTime updateTime;
 
-  private List<SysDepartmentTreeVo> children;
+  private List<SysDeptTreeVo> children;
 
 }

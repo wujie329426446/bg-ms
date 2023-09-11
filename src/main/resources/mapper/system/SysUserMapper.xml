@@ -1,11 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?><!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.bg.system.mapper.SysUserMapper">
-    <resultMap id="ResultMap" type="com.bg.system.entity.SysUser">
-        <id column="id" property="id" jdbcType="INTEGER"/>
-    </resultMap>
 
-    <resultMap id="SysUserMap" type="com.bg.system.vo.SysUserSecurityVo">
-        <result property="userId" column="user_id"/>
+    <resultMap id="SysUserMap" type="com.bg.system.vo.SysUserVo">
+        <result property="id" column="id"/>
         <result property="deptId" column="dept_id"/>
         <result property="username" column="username"/>
         <result property="nickname" column="nickname"/>
@@ -24,22 +21,22 @@
         <result property="updateName" column="update_name"/>
         <result property="updateTime" column="update_time"/>
         <result property="remark" column="remark"/>
-        <association property="dept" javaType="com.bg.system.vo.SysDeptSecurityVo" resultMap="SysDeptMap"/>
+        <association property="dept" javaType="com.bg.system.vo.SysDeptVo" resultMap="SysDeptMap"/>
     </resultMap>
 
-    <resultMap id="SysDeptMap" type="com.bg.system.vo.SysDeptSecurityVo">
-        <result property="deptId" column="d_dept_id"/>
-        <result property="parentId" column="parent_id"/>
-        <result property="deptName" column="dept_name"/>
-        <result property="sort" column="sort"/>
+    <resultMap id="SysDeptMap" type="com.bg.system.vo.SysDeptVo">
+        <result property="id" column="d_id"/>
+        <result property="parentId" column="d_parent_id"/>
+        <result property="deptName" column="d_name"/>
+        <result property="sort" column="d_sort"/>
         <result property="status" column="d_status"/>
         <result property="createTime" column="d_create_time"/>
         <result property="updateTime" column="d_update_time"/>
         <result property="remark" column="d_remark"/>
     </resultMap>
 
-    <sql id="SysUserVo">
-        select u.id          as user_id,
+    <sql id="BaseQuerySelect">
+        select u.id,
                u.dept_id,
                u.username,
                u.realname,
@@ -58,10 +55,10 @@
                u.update_name,
                u.update_time,
                u.remark,
-               d.id          as d_dept_id,
-               d.parent_id,
-               d.dept_name,
-               d.sort,
+               d.id          as d_id,
+               d.parent_id   as d_parent_id,
+               d.dept_name   as d_dept_name,
+               d.sort        as d_sort,
                d.status      as d_status,
                d.create_time as d_create_time,
                d.update_time as d_update_time,
@@ -71,7 +68,7 @@
     </sql>
 
     <select id="selectUserByUsername" resultMap="SysUserMap">
-        <include refid="SysUserVo"/>
+        <include refid="BaseQuerySelect"/>
         where u.username = #{username}
         and u.deleted = 0
     </select>
@@ -82,30 +79,9 @@
         where user_id = #{userId}
     </update>
 
-    <sql id="BaseQuerySelect">
-        select u.id,
-               u.username,
-               u.realname,
-               u.nickname,
-               u.avatar,
-               u.remark,
-               u.email,
-               u.status,
-               u.dept_id,
-               u.deleted,
-               u.create_time,
-               u.update_time,
-               u.creator_name,
-               u.update_name,
-               d.dept_name as deptName
-        from sys_user u
-                 inner join sys_dept d on u.dept_id = d.id and d.deleted = 0
-        where u.deleted = 0
-    </sql>
-
-
-    <select id="getSysUserPageList" resultType="com.bg.system.vo.SysUserQueryVo">
+    <select id="getSysUserPageList" resultType="com.bg.system.vo.SysUserVo">
         <include refid="BaseQuerySelect"/>
+        where u.deleted = 0
         <if test="param.deptId != null">
             and u.dept_id = #{param.deptId}
         </if>

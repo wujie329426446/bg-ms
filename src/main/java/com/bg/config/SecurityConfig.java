@@ -44,11 +44,11 @@ public class SecurityConfig {
         // 设置未登陆过滤器
         .exceptionHandling(handling -> handling.authenticationEntryPoint(authenticationEntryPoint))
         .authorizeHttpRequests(authorize -> authorize
-            .requestMatchers("/v1/api/admin/auth/login").permitAll()
+            .requestMatchers("/v1/api/admin/login").permitAll()
             .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/doc.html", "/webjars/**").permitAll()
             .anyRequest().authenticated()
         )
-        .logout(logout -> logout.logoutUrl("/v1/api/admin/auth/logout").logoutSuccessHandler(logoutSuccessHandler))
+        .logout(logout -> logout.logoutUrl("/v1/api/admin/logout").logoutSuccessHandler(logoutSuccessHandler))
         .addFilterBefore(jwtAuthenticationTokenFilter, UsernamePasswordAuthenticationFilter.class)
         .build();
   }

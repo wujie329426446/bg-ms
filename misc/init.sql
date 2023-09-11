@@ -277,7 +277,6 @@ CREATE TABLE `sys_role`
     `role_name`     varchar(32)         not null comment '角色名称',
     `role_code`     varchar(100)        default null comment '角色唯一编码',
     `type`          int                 default null comment '角色类型',
-    `description`   varchar(200)        default null comment '描述',
     `version`       int                 not null default '0' comment '版本',
     `create_time`   datetime            default current_timestamp comment '创建时间',
     `creator_id`    varchar(32)         default null comment '创建人id',
@@ -450,7 +449,7 @@ CREATE TABLE `sys_user`
     primary key (`id`) using btree
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=COMPACT COMMENT='系统用户类';
 --
--- Dumping index for table `sys_role`
+-- Dumping index for table `sys_user`
 --
 create index sys_user_dept_id_index on sys_user (dept_id);
 create index sys_user_username_index on sys_user (username);

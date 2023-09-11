@@ -10,7 +10,7 @@ import java.lang.reflect.Type;
 /**
  * 公共Service父类
  *
- * @author haseochen
+ * @author jiewus
  */
 public abstract class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, T> implements BaseService<T> {
 

@@ -1,15 +1,11 @@
 package com.bg.system.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.bg.system.entity.SysDept;
 import com.bg.system.param.SysDepartmentPageParam;
-import com.bg.system.vo.SysDepartmentVo;
+import com.bg.system.vo.SysDeptVo;
 import org.apache.ibatis.annotations.Param;
-import org.springframework.stereotype.Repository;
-
-import java.io.Serializable;
 
 /**
  * <pre>
@@ -20,13 +16,6 @@ import java.io.Serializable;
  */
 public interface SysDeptMapper extends BaseMapper<SysDept> {
 
-  /**
-   * 根据ID获取查询对象
-   *
-   * @param id
-   * @return
-   */
-  SysDepartmentVo getSysDepartmentById(Serializable id);
 
   /**
    * 获取分页对象
@@ -35,6 +24,6 @@ public interface SysDeptMapper extends BaseMapper<SysDept> {
    * @param sysDepartmentPageParam
    * @return
    */
-  IPage<SysDepartmentVo> getSysDepartmentPageList(@Param("page") Page page, @Param("param") SysDepartmentPageParam sysDepartmentPageParam);
+  Page<SysDeptVo> getSysDeptPageList(@Param("page") Page page, @Param("param") SysDepartmentPageParam pageParam);
 
 }

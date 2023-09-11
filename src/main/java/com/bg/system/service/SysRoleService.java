@@ -1,13 +1,12 @@
 package com.bg.system.service;
 
-import com.bg.commons.pagination.Paging;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.bg.commons.service.BaseService;
 import com.bg.system.entity.SysMenu;
 import com.bg.system.entity.SysRole;
 import com.bg.system.param.sysrole.SysRolePageParam;
 import com.bg.system.param.sysrole.UpdateSysRolePermissionParam;
 import com.bg.system.vo.SysRoleVo;
-
 import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
@@ -20,15 +19,6 @@ import java.util.Set;
  * @author jiewus
  */
 public interface SysRoleService extends BaseService<SysRole> {
-
-  /**
-   * 保存
-   *
-   * @param sysRole
-   * @return
-   * @throws Exception
-   */
-  boolean saveSysRole(SysRole sysRole) throws Exception;
 
   /**
    * 修改
@@ -60,11 +50,11 @@ public interface SysRoleService extends BaseService<SysRole> {
   /**
    * 获取分页对象
    *
-   * @param sysRolePageParam
+   * @param pageParam
    * @return
    * @throws Exception
    */
-  Paging<SysRole> getSysRolePageList(SysRolePageParam sysRolePageParam) throws Exception;
+  Page<SysRole> getSysRolePageList(SysRolePageParam pageParam) throws Exception;
 
   /**
    * 根据id校验角色是否存在并且已启用
@@ -114,5 +104,5 @@ public interface SysRoleService extends BaseService<SysRole> {
    * @param userId 用户主键
    * @return 角色集合
    */
-  Set<String> getRolesByUserId(String userId);
+  List<SysRoleVo> getRolesByUserId(String userId);
 }

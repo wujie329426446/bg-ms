@@ -1,12 +1,11 @@
 package com.bg.system.service;
 
-import com.bg.commons.pagination.Paging;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.bg.commons.service.BaseService;
 import com.bg.system.entity.SysDept;
 import com.bg.system.param.SysDepartmentPageParam;
-import com.bg.system.vo.SysDepartmentVo;
-import com.bg.system.vo.SysDepartmentTreeVo;
-
+import com.bg.system.vo.SysDeptTreeVo;
+import com.bg.system.vo.SysDeptVo;
 import java.io.Serializable;
 import java.util.List;
 
@@ -53,25 +52,16 @@ public interface SysDeptService extends BaseService<SysDept> {
    * @return
    * @throws Exception
    */
-  SysDepartmentVo getSysDepartmentById(Serializable id) throws Exception;
+  SysDeptVo getSysDepartmentById(Serializable id) throws Exception;
 
   /**
    * 获取分页对象
    *
-   * @param sysDepartmentPageParam
+   * @param pageParam
    * @return
    * @throws Exception
    */
-  Paging<SysDepartmentVo> getSysDepartmentPageList(SysDepartmentPageParam sysDepartmentPageParam) throws Exception;
-
-  /**
-   * 根据id校验部门是否存在并且已启用
-   *
-   * @param id
-   * @return
-   * @throws Exception
-   */
-  boolean isEnableSysDepartment(String id) throws Exception;
+  Page<SysDeptVo> getSysDepartmentPageList(SysDepartmentPageParam pageParam) throws Exception;
 
   /**
    * 获取所有可用的部门列表
@@ -85,6 +75,6 @@ public interface SysDeptService extends BaseService<SysDept> {
    *
    * @return
    */
-  List<SysDepartmentTreeVo> getDepartmentTree();
+  List<SysDeptTreeVo> getDepartmentTree();
 
 }

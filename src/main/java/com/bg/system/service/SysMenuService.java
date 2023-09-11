@@ -1,13 +1,12 @@
 package com.bg.system.service;
 
 
-import com.bg.commons.pagination.Paging;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.bg.commons.service.BaseService;
 import com.bg.system.entity.SysMenu;
 import com.bg.system.param.SysPermissionPageParam;
-import com.bg.system.vo.SysPermissionVo;
 import com.bg.system.vo.SysPermissionTreeVo;
-
+import com.bg.system.vo.SysPermissionVo;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
@@ -64,7 +63,7 @@ public interface SysMenuService extends BaseService<SysMenu> {
    * @return
    * @throws Exception
    */
-  Paging<SysPermissionVo> getSysPermissionPageList(SysPermissionPageParam sysPermissionPageParam) throws Exception;
+  Page<SysPermissionVo> getSysPermissionPageList(SysPermissionPageParam sysPermissionPageParam) throws Exception;
 
   /**
    * 判断权限id是否存在

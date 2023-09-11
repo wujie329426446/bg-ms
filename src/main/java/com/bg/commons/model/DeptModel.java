@@ -12,7 +12,7 @@ import lombok.Data;
  * @author jiewus
  */
 @Data
-public class SysDeptModel implements Serializable {
+public class DeptModel implements Serializable {
 
   @Serial
   private static final long serialVersionUID = -118874730758289766L;
@@ -39,6 +39,6 @@ public class SysDeptModel implements Serializable {
   private Integer deleted;
 
   @Schema(description = "子部门")
-  private List<SysDeptModel> children;
+  private List<DeptModel> children;
 
 }

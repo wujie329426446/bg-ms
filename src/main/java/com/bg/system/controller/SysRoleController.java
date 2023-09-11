@@ -1,21 +1,24 @@
 package com.bg.system.controller;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.bg.commons.api.ApiResult;
 import com.bg.commons.controller.BaseController;
 import com.bg.commons.core.validator.groups.Add;
 import com.bg.commons.core.validator.groups.Update;
 import com.bg.commons.log.annotation.OperationLog;
 import com.bg.commons.log.enums.OperationLogType;
-import com.bg.commons.pagination.Paging;
 import com.bg.system.entity.SysMenu;
 import com.bg.system.entity.SysRole;
+import com.bg.system.param.RolePageParam;
 import com.bg.system.param.sysrole.SysRolePageParam;
 import com.bg.system.param.sysrole.UpdateSysRolePermissionParam;
 import com.bg.system.service.SysRoleService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -36,19 +39,19 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @Slf4j
 @RestController
-@RequestMapping("/v1/api/admin/auth/sysRole")
+@RequestMapping("/v1/api/admin/sysRole")
 @Tag(name = "系统角色API")
-public class SysRoleController extends BaseController<SysRole, SysRoleService, SysRole> {
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
+public class SysRoleController extends BaseController<SysRole, SysRoleService, RolePageParam> {
 
-  /**
-   * 添加系统角色
-   */
   @PostMapping("/add")
   @PreAuthorize("@auth.hasPermission('sys:role:add')")
   @OperationLog(name = "添加系统角色", type = OperationLogType.ADD)
-  @Operation(summary = "添加系统角色")
-  public ApiResult<Boolean> addSysRole(@Validated(Add.class) @RequestBody SysRole sysRole) throws Exception {
-    boolean flag = baseService.saveSysRole(sysRole);
+  @Operation(
+      summary = "添加系统角色"
+  )
+  public ApiResult<Boolean> addSysRole(@Validated(Add.class) @RequestBody SysRole sysRole) {
+    Boolean flag = baseService.save(sysRole);
     return ApiResult.result(flag);
   }
 
@@ -91,13 +94,13 @@ public class SysRoleController extends BaseController<SysRole, SysRoleService, S
   /**
    * 系统角色分页列表
    */
-  @GetMapping("/getPageList")
+  @PostMapping("/getPageList")
   @PreAuthorize("@auth.hasPermission('sys:role:page')")
   @OperationLog(name = "系统角色分页列表", type = OperationLogType.PAGE)
   @Operation(summary = "系统角色分页列表")
-  public ApiResult<Paging<SysRole>> getSysRolePageList(@Validated SysRolePageParam sysRolePageParam) throws Exception {
-    Paging<SysRole> paging = baseService.getSysRolePageList(sysRolePageParam);
-    return ApiResult.success(paging);
+  public ApiResult<Page<SysRole>> getSysRolePageList(@Validated SysRolePageParam pageParam) throws Exception {
+    Page<SysRole> page = baseService.getSysRolePageList(pageParam);
+    return ApiResult.success(page);
   }
 
   /**

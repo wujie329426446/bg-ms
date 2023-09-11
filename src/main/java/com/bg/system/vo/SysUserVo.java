@@ -7,6 +7,7 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 import lombok.Data;
 import lombok.ToString;
 import lombok.experimental.Accessors;
@@ -17,16 +18,18 @@ import lombok.experimental.Accessors;
  * @author jiewus
  */
 
-@ToString(callSuper = true)
+
 @Data
 @Accessors(chain = true)
-public class SysUserSecurityVo implements Serializable {
+@ToString(callSuper = true)
+@Schema(description = "系统用户参数")
+public class SysUserVo implements Serializable {
 
   @Serial
   private static final long serialVersionUID = 1L;
 
   @Schema(description = "用户id")
-  private String userId;
+  private String id;
 
   @Schema(description = "账号")
   private String username;
@@ -43,27 +46,39 @@ public class SysUserSecurityVo implements Serializable {
   @Schema(description = "用户邮箱")
   private String email;
 
+  @Schema(description = "手机号码")
+  private String phone;
+
+  @Schema(description = "性别，0：女，1：男，默认1")
+  private GenderEnum gender;
+
   @Schema(description = "最后登陆时间")
   @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
   private LocalDateTime loginDate;
 
+  @Schema(description = "loginIp")
+  private String loginIp;
+
   @Schema(description = "头像")
   private String avatar;
 
-  @Schema(description = "角色编码集合")
-  private List<String> roles;
-
   @Schema(description = "部门id")
   private String deptId;
-
-  @Schema(description = "手机号码")
-  private String phone;
 
   @Schema(description = "备注")
   private String remark;
 
   @Schema(description = "状态，0：禁用，1：启用，2：锁定")
   private Integer status;
+
+  @Schema(description = "部门")
+  private SysDeptVo dept;
+
+  @Schema(description = "角色集合")
+  private List<SysRoleVo> roleList;
+
+  @Schema(description = "角色编码集合")
+  private Set<String> roles;
 
   @Schema(description = "用户创建时间")
   @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
@@ -79,15 +94,8 @@ public class SysUserSecurityVo implements Serializable {
   @Schema(description = "修改时间")
   private LocalDateTime updateTime;
 
-  @Schema(description = "部门")
-  private SysDeptSecurityVo dept;
-
   @Schema(description = "删除标识")
   private Integer deleted;
 
-  @Schema(description = "性别")
-  private GenderEnum gender;
 
-  @Schema(description = "loginIp")
-  private String loginIp;
 }

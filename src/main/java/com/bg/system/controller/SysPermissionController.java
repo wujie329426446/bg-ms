@@ -1,10 +1,10 @@
 package com.bg.system.controller;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.bg.commons.api.ApiResult;
 import com.bg.commons.controller.BaseController;
 import com.bg.commons.log.annotation.OperationLog;
 import com.bg.commons.log.enums.OperationLogType;
-import com.bg.commons.pagination.Paging;
 import com.bg.system.entity.SysMenu;
 import com.bg.system.param.SysPermissionPageParam;
 import com.bg.system.service.SysMenuService;
@@ -35,7 +35,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @Slf4j
 @RestController
-@RequestMapping("/v1/api/admin/auth/sysPermission")
+@RequestMapping("/v1/api/admin/sysPermission")
 @Tag(name = "系统权限 API")
 public class SysPermissionController extends BaseController<SysMenu, SysMenuService, SysMenu> {
 
@@ -97,9 +97,9 @@ public class SysPermissionController extends BaseController<SysMenu, SysMenuServ
   @PreAuthorize("@auth.hasPermission('sys:permission:page')")
   @OperationLog(name = "系统权限分页列表", type = OperationLogType.PAGE)
   @Operation(summary = "系统权限分页列表")
-  public ApiResult<Paging<SysPermissionVo>> getSysPermissionPageList(@Validated @RequestBody SysPermissionPageParam sysPermissionPageParam) throws Exception {
-    Paging<SysPermissionVo> paging = baseService.getSysPermissionPageList(sysPermissionPageParam);
-    return ApiResult.success(paging);
+  public ApiResult<Page<SysPermissionVo>> getSysPermissionPageList(@Validated @RequestBody SysPermissionPageParam pageParam) throws Exception {
+    Page<SysPermissionVo> page = baseService.getSysPermissionPageList(pageParam);
+    return ApiResult.success(page);
   }
 
   /**

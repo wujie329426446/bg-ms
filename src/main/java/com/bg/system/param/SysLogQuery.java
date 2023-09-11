@@ -1,10 +1,12 @@
 package com.bg.system.param;
 
-import com.bg.commons.pagination.BasePageOrderParam;
+import com.bg.commons.pagination.BasePageParam;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
-
+import java.io.Serial;
 import java.util.Date;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.experimental.Accessors;
 
 /**
  * 系统日志查询参数
@@ -12,9 +14,12 @@ import java.util.Date;
  * @author jiewus
  */
 @Data
+@Accessors(chain = true)
+@EqualsAndHashCode(callSuper = true)
 @Schema(description = "系统日志查询参数")
-public class SysLogQuery extends BasePageOrderParam {
+public class SysLogQuery extends BasePageParam {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   @Schema(description = "模块名称")

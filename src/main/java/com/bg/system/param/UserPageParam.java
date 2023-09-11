@@ -1,22 +1,25 @@
 package com.bg.system.param;
 
-import com.bg.commons.pagination.BasePageOrderParam;
+import com.bg.commons.pagination.BasePageParam;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.io.Serial;
+import java.util.Date;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import lombok.experimental.Accessors;
-
-import java.util.Date;
 
 /**
  * @author jiewus
  */
 @Data
 @Accessors(chain = true)
+@ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 @Schema(description = "用户列表参数")
-public class UserPageParam extends BasePageOrderParam {
+public class UserPageParam extends BasePageParam {
 
+  @Serial
   private static final long serialVersionUID = 7437881671144580610L;
 
   @Schema(description = "部门id")
@@ -39,4 +42,5 @@ public class UserPageParam extends BasePageOrderParam {
 
   @Schema(description = "昵称")
   private String nickname;
+
 }

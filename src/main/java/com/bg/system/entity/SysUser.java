@@ -1,24 +1,20 @@
 package com.bg.system.entity;
 
 import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.extension.activerecord.Model;
+import com.bg.commons.core.validator.groups.Add;
 import com.bg.commons.entity.BaseEntity;
 import com.bg.commons.enums.GenderEnum;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Null;
 import java.io.Serial;
+import java.time.LocalDateTime;
+import java.util.List;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.experimental.Accessors;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 /**
  * 用户 Model
@@ -26,10 +22,11 @@ import java.util.List;
  * @author jiewus
  */
 
-@ToString(callSuper = true)
-@EqualsAndHashCode(callSuper = true)
+
 @Data
 @Accessors(chain = true)
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
 @Schema(description = "用户")
 @TableName("sys_user")
 public class SysUser extends BaseEntity<SysUser> {
@@ -39,6 +36,7 @@ public class SysUser extends BaseEntity<SysUser> {
 
   @Schema(description = "账号")
   @TableField("username")
+  @NotBlank(message = "用户名不能为空", groups = {Add.class})
   private String username;
 
   @Schema(description = "部门id")
@@ -55,9 +53,11 @@ public class SysUser extends BaseEntity<SysUser> {
 
   @Schema(description = "用户邮箱")
   @TableField("email")
+  @NotBlank(message = "用户邮箱不能为空", groups = {Add.class})
   private String email;
 
   @Schema(description = "手机号码")
+  @NotBlank(message = "手机号码不能为空", groups = {Add.class})
   @TableField("phone")
   private String phone;
 
@@ -84,6 +84,6 @@ public class SysUser extends BaseEntity<SysUser> {
 
   @Schema(description = "角色集合")
   @TableField(exist = false)
-  private List<String> roles;
+  private List<String> roleIds;
 
 }

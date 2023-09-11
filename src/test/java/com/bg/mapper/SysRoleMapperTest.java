@@ -3,13 +3,11 @@ package com.bg.mapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.bg.system.entity.SysRole;
 import com.bg.system.mapper.SysRoleMapper;
-// 使用junit5的org.junit.jupiter.api.Test可以比junit4的org.junit.test少引入注释@RunWith(SpringRunner.class)
+import java.util.Arrays;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-
-import java.util.Arrays;
-import java.util.List;
 
 @SpringBootTest
 public class SysRoleMapperTest {
@@ -57,7 +55,7 @@ public class SysRoleMapperTest {
     SysRole sysRole = sysRoleMapper.selectById(1);
 
     //设置修改值
-    sysRole.setDescription("系统管理员尚硅谷");
+    sysRole.setRemark("系统管理员尚硅谷");
 
     //调用方法实现修改
     sysRoleMapper.updateById(sysRole);
@@ -69,7 +67,7 @@ public class SysRoleMapperTest {
     SysRole sysRole = new SysRole();
     sysRole.setRoleName("测试角色2");
     sysRole.setRoleCode("testManager2");
-    sysRole.setDescription("测试角色2");
+    sysRole.setRemark("测试角色2");
     int rows = sysRoleMapper.insert(sysRole);
     System.out.println(rows);
   }

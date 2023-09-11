@@ -1,6 +1,6 @@
 package com.bg.auth.annotation;
 
-import com.bg.commons.vo.RoleInfoVO;
+import com.bg.commons.model.RoleModel;
 import java.util.List;
 import java.util.Set;
 import org.springframework.stereotype.Component;
@@ -36,7 +36,7 @@ public class AuthenticationAnnotation {
     if (isAdmin()) {
       return true;
     }
-    List<RoleInfoVO> roleSet = getRoles();
+    List<RoleModel> roleSet = getRoles();
     for (String role : roles) {
       if (roleSet.contains(role)) {
         return true;
@@ -55,7 +55,7 @@ public class AuthenticationAnnotation {
     if (isAdmin()) {
       return true;
     }
-    List<RoleInfoVO> roleSet = getRoles();
+    List<RoleModel> roleSet = getRoles();
     for (String role : roles) {
       if (!roleSet.contains(role)) {
         return false;

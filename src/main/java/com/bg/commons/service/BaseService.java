@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 /**
  * 公共Service接口
  *
- * @author haseochen
+ * @author jiewus
  */
 public interface BaseService<T> extends IService<T> {
 

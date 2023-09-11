@@ -1,17 +1,14 @@
 package com.bg.system.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.bg.system.entity.SysMenu;
 import com.bg.system.param.SysPermissionPageParam;
 import com.bg.system.vo.SysPermissionVo;
-import org.apache.ibatis.annotations.Param;
-import org.springframework.stereotype.Repository;
-
 import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * <pre>
@@ -37,7 +34,7 @@ public interface SysMenuMapper extends BaseMapper<SysMenu> {
    * @param sysPermissionPageParam
    * @return
    */
-  IPage<SysPermissionVo> getSysPermissionPageList(@Param("page") Page page, @Param("param") SysPermissionPageParam sysPermissionPageParam);
+  Page<SysPermissionVo> getSysPermissionPageList(@Param("page") Page page, @Param("param") SysPermissionPageParam sysPermissionPageParam);
 
   /**
    * 根据用户id获取该用户所有权限编码

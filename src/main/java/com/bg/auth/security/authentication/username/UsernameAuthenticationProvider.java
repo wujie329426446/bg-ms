@@ -4,7 +4,7 @@ import com.bg.auth.service.authentication.AuthenticationService;
 import com.bg.commons.enums.LoginTypeEnum;
 import com.bg.commons.model.UserModel;
 import com.bg.system.service.SysUserService;
-import com.bg.system.vo.SysUserSecurityVo;
+import com.bg.system.vo.SysUserVo;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -38,7 +38,7 @@ public class UsernameAuthenticationProvider implements AuthenticationProvider {
     String username = authenticationToken.getPrincipal().toString();
     String password = authenticationToken.getCredentials().toString();
 
-    SysUserSecurityVo user = userService.selectUserByUsername(username);
+    SysUserVo user = userService.selectUserByUsername(username);
 
     // TODO: 2023/6/26 这里登录方式以后增加邮件
     UserModel userModel = null;

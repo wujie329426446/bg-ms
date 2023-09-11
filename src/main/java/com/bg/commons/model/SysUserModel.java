@@ -1,6 +1,5 @@
 package com.bg.commons.model;
 
-import com.bg.commons.entity.BaseEntity;
 import com.bg.commons.enums.GenderEnum;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -69,7 +68,7 @@ public class SysUserModel implements Serializable {
   private LocalDateTime loginDate;
 
   @Schema(description = "部门对象")
-  private SysDeptModel dept;
+  private DeptModel dept;
 
   @Schema(description = "角色主键集合")
   private List<String> roleIds;

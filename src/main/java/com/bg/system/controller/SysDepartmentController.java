@@ -1,15 +1,15 @@
 package com.bg.system.controller;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.bg.commons.api.ApiResult;
 import com.bg.commons.controller.BaseController;
 import com.bg.commons.log.annotation.OperationLog;
 import com.bg.commons.log.enums.OperationLogType;
-import com.bg.commons.pagination.Paging;
 import com.bg.system.entity.SysDept;
 import com.bg.system.param.SysDepartmentPageParam;
 import com.bg.system.service.SysDeptService;
-import com.bg.system.vo.SysDepartmentTreeVo;
-import com.bg.system.vo.SysDepartmentVo;
+import com.bg.system.vo.SysDeptTreeVo;
+import com.bg.system.vo.SysDeptVo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
@@ -32,7 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @Slf4j
 @RestController
-@RequestMapping("/v1/api/admin/auth/sysDepartment")
+@RequestMapping("/v1/api/admin/sysDepartment")
 @Tag(name = "系统部门API")
 public class SysDepartmentController extends BaseController<SysDept, SysDeptService, SysDept> {
 
@@ -79,9 +79,9 @@ public class SysDepartmentController extends BaseController<SysDept, SysDeptServ
   @PreAuthorize("@auth.hasPermission('sys:department:info')")
   @OperationLog(name = "部门详情", type = OperationLogType.INFO)
   @Operation(summary = "部门详情")
-  public ApiResult<SysDepartmentVo> getSysDepartment(@PathVariable("id") String id) throws Exception {
-    SysDepartmentVo sysDepartmentVo = baseService.getSysDepartmentById(id);
-    return ApiResult.success(sysDepartmentVo);
+  public ApiResult<SysDeptVo> getSysDepartment(@PathVariable("id") String id) throws Exception {
+    SysDeptVo sysDeptVo = baseService.getSysDepartmentById(id);
+    return ApiResult.success(sysDeptVo);
   }
 
   /**
@@ -91,9 +91,9 @@ public class SysDepartmentController extends BaseController<SysDept, SysDeptServ
   @PreAuthorize("@auth.hasPermission('sys:department:page')")
   @OperationLog(name = "部门分页列表", type = OperationLogType.PAGE)
   @Operation(summary = "部门分页列表")
-  public ApiResult<Paging<SysDepartmentVo>> getSysDepartmentPageList(@Validated @RequestBody SysDepartmentPageParam sysDepartmentPageParam) throws Exception {
-    Paging<SysDepartmentVo> paging = baseService.getSysDepartmentPageList(sysDepartmentPageParam);
-    return ApiResult.success(paging);
+  public ApiResult<Page<SysDeptVo>> getSysDepartmentPageList(@Validated @RequestBody SysDepartmentPageParam pageParam) throws Exception {
+    Page<SysDeptVo> page = baseService.getSysDepartmentPageList(pageParam);
+    return ApiResult.success(page);
   }
 
   /**
@@ -117,8 +117,8 @@ public class SysDepartmentController extends BaseController<SysDept, SysDeptServ
   @PreAuthorize("@auth.hasPermission('sys:department:all:tree')")
   @OperationLog(name = "获取所有部门的树形列表", type = OperationLogType.OTHER_QUERY)
   @Operation(summary = "获取所有部门的树形列表")
-  public ApiResult<List<SysDepartmentTreeVo>> getDepartmentTree() throws Exception {
-    List<SysDepartmentTreeVo> treeVos = baseService.getDepartmentTree();
+  public ApiResult<List<SysDeptTreeVo>> getDepartmentTree() throws Exception {
+    List<SysDeptTreeVo> treeVos = baseService.getDepartmentTree();
     return ApiResult.success(treeVos);
   }
 

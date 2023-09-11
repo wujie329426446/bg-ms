@@ -2,13 +2,10 @@ package com.bg.system.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.bg.commons.enums.StateEnum;
 import com.bg.commons.exception.BusinessException;
-import com.bg.commons.pagination.PageInfo;
-import com.bg.commons.pagination.Paging;
 import com.bg.commons.service.impl.BaseServiceImpl;
 import com.bg.system.convert.SysPermissionConvertMapper;
 import com.bg.system.entity.SysMenu;
@@ -65,7 +62,7 @@ public class SysMenuServiceImpl extends BaseServiceImpl<SysMenuMapper, SysMenu> 
   public boolean updateSysPermission(SysMenu sysMenu) throws Exception {
     // 获取权限
     if (getById(sysMenu.getId()) == null) {
-      throw new BusinessException("权限不存在");
+      throw BusinessException.build("权限不存在");
     }
 //        sysPermission.setUpdateTime(new Date());
     return super.updateById(sysMenu);
@@ -76,7 +73,7 @@ public class SysMenuServiceImpl extends BaseServiceImpl<SysMenuMapper, SysMenu> 
   public boolean deleteSysPermission(String id) throws Exception {
     boolean isExists = sysRoleMenuService.isExistsByPermissionId(id);
     if (isExists) {
-      throw new BusinessException("该权限存在角色关联关系，不能删除");
+      throw BusinessException.build("该权限存在角色关联关系，不能删除");
     }
     return super.removeById(id);
   }
@@ -87,10 +84,10 @@ public class SysMenuServiceImpl extends BaseServiceImpl<SysMenuMapper, SysMenu> 
   }
 
   @Override
-  public Paging<SysPermissionVo> getSysPermissionPageList(SysPermissionPageParam sysPermissionPageParam) throws Exception {
-    Page<SysPermissionVo> page = new PageInfo<>(sysPermissionPageParam, OrderItem.desc("create_time"));
-    IPage<SysPermissionVo> iPage = sysMenuMapper.getSysPermissionPageList(page, sysPermissionPageParam);
-    return new Paging(iPage);
+  public Page<SysPermissionVo> getSysPermissionPageList(SysPermissionPageParam pageParam) throws Exception {
+    pageParam.pageSortsHandle(OrderItem.desc("create_time"));
+    Page<SysPermissionVo> page = sysMenuMapper.getSysPermissionPageList(pageParam.getPage(), pageParam);
+    return page;
   }
 
   @Override

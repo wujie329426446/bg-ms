@@ -123,7 +123,7 @@ bg:
   # 是否启用验证码
   enable-verify-code: false
   # 默认新建用户登录初始化密码
-  login-init-password: admin
+  login-init-password: abc@123
   login-init-head: http://${bg.server-ip}/api/resource/logo.png
   # 实现BaseEnum接口的枚举包
   enum-packages: com.example.foorbar.enums

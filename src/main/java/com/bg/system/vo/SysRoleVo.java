@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
 import lombok.Data;
+import lombok.ToString;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
@@ -18,6 +19,7 @@ import java.util.Set;
  */
 @Data
 @Accessors(chain = true)
+@ToString(callSuper = true)
 @Schema(description = "系统角色查询参数")
 public class SysRoleVo implements Serializable {
 
@@ -27,16 +29,16 @@ public class SysRoleVo implements Serializable {
   private String id;
 
   @Schema(description = "角色名称")
-  private String name;
+  private String roleName;
 
   @Schema(description = "角色唯一编码")
-  private String code;
+  private String roleCode;
 
   @Schema(description = "角色类型")
   private Integer type;
 
   @Schema(description = "角色状态，0：禁用，1：启用")
-  private Integer state;
+  private Integer status;
 
   @Schema(description = "备注")
   private String remark;

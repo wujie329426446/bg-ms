@@ -38,9 +38,6 @@ public interface SysRoleMapper extends BaseMapper<SysRole> {
    */
   IPage<SysRoleVo> getSysRolePageList(@Param("page") Page page, @Param("param") SysRolePageParam sysRolePageParam);
 
-  //条件分页查询,XML调用demo，实际未使用
-  IPage<SysRole> selectPageDemo(Page<SysRole> pageParam, @Param("vo") SysRoleVo sysRoleVo);
-
   /**
    * 根据用户主键获取角色列表
    *

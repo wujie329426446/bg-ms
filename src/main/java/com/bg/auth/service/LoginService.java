@@ -1,6 +1,10 @@
 package com.bg.auth.service;
 
 import com.bg.auth.security.authentication.username.UsernameAuthenticationToken;
+import com.bg.commons.api.ApiCode;
+import com.bg.commons.constant.CommonConstant;
+import com.bg.commons.enums.LoginTypeEnum;
+import com.bg.commons.exception.BusinessException;
 import com.bg.commons.model.LoginModel;
 import com.bg.commons.model.UserModel;
 import com.bg.system.service.SysLogLoginService;
@@ -39,21 +43,34 @@ public class LoginService {
    * @return token
    */
   public String login(LoginModel loginModel) {
-    Authentication authentication;
     AbstractAuthenticationToken authenticationToken;
 
-    authenticationToken = new UsernameAuthenticationToken(loginModel.getUsername(), loginModel.getPassword());
+    LoginTypeEnum loginType = loginModel.getLoginType();
+    String username = loginModel.getUsername();
+    String password = loginModel.getPassword();
 
-    SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-    String account = authenticationToken.getPrincipal().toString();
-    authentication = authenticationManager.authenticate(authenticationToken);
+    Authentication authentication = switch (loginType) {
+      case USER_NAME -> {
+        authenticationToken = new UsernameAuthenticationToken(username, password);
+        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+        authentication = authenticationManager.authenticate(authenticationToken);
+        yield authentication;
+      }
+      case EMAIL -> {
+        // TODO 邮箱登录
+        throw BusinessException.build(ApiCode.LOGIN_EXCEPTION.getCode(), "暂未开放邮箱登录方式");
+      }
+      case PHONE -> {
+        // TODO 手机登录
+        throw BusinessException.build(ApiCode.LOGIN_EXCEPTION.getCode(), "暂未开放手机登录方式");
+      }
+    };
 
     UserModel userModel = (UserModel) authentication.getPrincipal();
-
     String token = tokenService.createToken(userModel);
 
-    logLoginService.recordLoginInfo(userModel.getUser().getUserId(), userModel, account, loginModel.getLoginType(), 1, "登陆成功");
-    log.info("用户使用 {} 方式登陆成功，登陆账号：{}", loginModel.getLoginType(), account);
+    logLoginService.recordLoginInfo(userModel.getUser().getUserId(), userModel, username, loginType, CommonConstant.SUCCESS_INT, "登陆成功");
+    log.info("用户使用 {} 方式登录成功，登录账号：{}", loginType.getDesc(), username);
 
     return token;
   }

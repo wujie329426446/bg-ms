@@ -1,7 +1,6 @@
 package com.bg.commons.model;
 
 import com.bg.commons.enums.LoginTypeEnum;
-import com.bg.commons.vo.RoleInfoVO;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -80,7 +79,7 @@ public class UserModel implements UserDetails {
   private String token;
 
   @Schema(description = "角色集合")
-  private List<RoleInfoVO> roles;
+  private List<RoleModel> roles;
 
   @Schema(description = "权限集合")
   private Set<String> permissions;

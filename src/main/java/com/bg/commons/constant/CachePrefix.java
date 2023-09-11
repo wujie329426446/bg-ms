@@ -5,24 +5,21 @@ package com.bg.commons.constant;
  *
  * @author Tang
  */
-public class CachePrefix {
-
-  private CachePrefix() {
-  }
+public interface CachePrefix {
 
   /**
    * 缓存前缀
    */
-  public static final String SYSTEM = "bg:";
+  String SYSTEM = "bg:";
 
   /**
    * 登陆用户信息缓存前缀
    */
-  public static final String LOGIN_TOKENS = SYSTEM + "login_tokens:";
+  String LOGIN_TOKENS = SYSTEM + "login_tokens:";
 
   /**
    * 字典数据缓存前缀
    */
-  public static final String DICT_TYPE = SYSTEM + "bg_type:";
+  String DICT_TYPE = SYSTEM + "bg_type:";
 
 }

@@ -3,22 +3,25 @@ package com.bg.generator.config;
 import cn.hutool.core.lang.Dict;
 import cn.hutool.setting.yaml.YamlUtil;
 import com.baomidou.mybatisplus.annotation.IdType;
-import com.bg.generator.enums.RequestMappingType;
+import com.baomidou.mybatisplus.core.metadata.OrderItem;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.bg.commons.api.ApiResult;
 import com.bg.commons.exception.BusinessException;
-import com.bg.commons.pagination.BasePageOrderParam;
-import com.bg.commons.pagination.OrderByItem;
-import com.bg.commons.pagination.Paging;
+import com.bg.commons.pagination.BasePageParam;
 import com.bg.commons.service.BaseService;
 import com.bg.commons.service.impl.BaseServiceImpl;
 import com.bg.generator.enums.DefaultOrderType;
+import com.bg.generator.enums.RequestMappingType;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-
-import java.util.*;
 
 /**
  * @author jiewus
@@ -401,7 +404,7 @@ public class GeneratorConfig {
    */
   public void init() {
     if (StringUtils.isBlank(this.parentPackage)) {
-      throw new BusinessException("parentPackage不能为空");
+      throw BusinessException.build("parentPackage不能为空");
     }
     this.projectPackagePath = this.parentPackage.replaceAll("\\.", "/");
     this.commonParentPackage = parentPackage + ".framework";
@@ -410,10 +413,10 @@ public class GeneratorConfig {
     this.superEntityCommonColumns = new String[]{};
 
     this.commonApiResult = ApiResult.class.getName();
-    this.superQuery = BasePageOrderParam.class.getName();
-    this.commonPaging = Paging.class.getName();
+    this.superQuery = BasePageParam.class.getName();
+    this.commonPaging = Page.class.getName();
     this.commonBusinessException = BusinessException.class.getName();
-    this.commonOrderByItem = OrderByItem.class.getName();
+    this.commonOrderByItem = OrderItem.class.getName();
     this.commonFields = Arrays.asList("remark", "version", "deleted", "createTime", "updateTime");
     this.voExcludeFields = Arrays.asList("password", "version", "deleted");
 

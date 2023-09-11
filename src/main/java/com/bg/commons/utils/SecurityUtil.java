@@ -1,6 +1,6 @@
 package com.bg.commons.utils;
 
-import com.bg.commons.vo.RoleInfoVO;
+import com.bg.commons.model.RoleModel;
 import com.bg.commons.model.SysUserModel;
 import com.bg.commons.model.UserModel;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -52,7 +52,7 @@ public class SecurityUtil {
    *
    * @return 角色信息
    */
-  public static List<RoleInfoVO> getRoles() {
+  public static List<RoleModel> getRoles() {
     return getUserModel().getRoles();
   }
 

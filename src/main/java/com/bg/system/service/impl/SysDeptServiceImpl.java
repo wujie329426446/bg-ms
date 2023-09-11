@@ -1,20 +1,18 @@
 package com.bg.system.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.bg.commons.enums.StateEnum;
-import com.bg.commons.pagination.PageInfo;
-import com.bg.commons.pagination.Paging;
 import com.bg.commons.service.impl.BaseServiceImpl;
-import com.bg.system.convert.SysDepartmentConvertMapper;
+import com.bg.system.convert.SysDeptConvertMapper;
+import com.bg.system.convert.SysDeptTreeConvertMapper;
 import com.bg.system.entity.SysDept;
 import com.bg.system.mapper.SysDeptMapper;
 import com.bg.system.param.SysDepartmentPageParam;
 import com.bg.system.service.SysDeptService;
-import com.bg.system.vo.SysDepartmentTreeVo;
-import com.bg.system.vo.SysDepartmentVo;
+import com.bg.system.vo.SysDeptTreeVo;
+import com.bg.system.vo.SysDeptVo;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +38,10 @@ public class SysDeptServiceImpl extends BaseServiceImpl<SysDeptMapper, SysDept> 
   private SysDeptMapper sysDeptMapper;
 
   @Autowired
-  private SysDepartmentConvertMapper sysDepartmentConvertMapper;
+  private SysDeptTreeConvertMapper sysDeptTreeConvertMapper;
+
+  @Autowired
+  private SysDeptConvertMapper sysDeptConvertMapper;
 
   @Transactional(rollbackFor = Exception.class)
   @Override
@@ -62,24 +63,17 @@ public class SysDeptServiceImpl extends BaseServiceImpl<SysDeptMapper, SysDept> 
   }
 
   @Override
-  public SysDepartmentVo getSysDepartmentById(Serializable id) throws Exception {
-    return sysDeptMapper.getSysDepartmentById(id);
+  public SysDeptVo getSysDepartmentById(Serializable id) throws Exception {
+    SysDept sysDept = this.getById(id);
+    SysDeptVo sysDeptVo = sysDeptConvertMapper.toDto(sysDept);
+    return sysDeptVo;
   }
 
   @Override
-  public Paging<SysDepartmentVo> getSysDepartmentPageList(SysDepartmentPageParam sysDepartmentPageParam) throws Exception {
-    Page<SysDepartmentVo> page = new PageInfo<>(sysDepartmentPageParam, OrderItem.desc("create_time"));
-    IPage<SysDepartmentVo> iPage = sysDeptMapper.getSysDepartmentPageList(page, sysDepartmentPageParam);
-    return new Paging(iPage);
-  }
-
-  @Override
-  public boolean isEnableSysDepartment(String id) throws Exception {
-    SysDept sysDept = new SysDept();
-    sysDept.setId(id);
-    sysDept.setStatus(StateEnum.ENABLE.getCode());
-    Long count = sysDeptMapper.selectCount(new QueryWrapper<>(sysDept));
-    return count > 0;
+  public Page<SysDeptVo> getSysDepartmentPageList(SysDepartmentPageParam pageParam) throws Exception {
+    pageParam.pageSortsHandle(OrderItem.desc("create_time"));
+    Page<SysDeptVo> page = sysDeptMapper.getSysDeptPageList(pageParam.getPage(), pageParam);
+    return page;
   }
 
   @Override
@@ -91,14 +85,14 @@ public class SysDeptServiceImpl extends BaseServiceImpl<SysDeptMapper, SysDept> 
   }
 
   @Override
-  public List<SysDepartmentTreeVo> getDepartmentTree() {
+  public List<SysDeptTreeVo> getDepartmentTree() {
     List<SysDept> sysDeptList = getAllDepartmentList();
     if (CollectionUtils.isEmpty(sysDeptList)) {
       return null;
     }
-    List<SysDepartmentTreeVo> list = sysDepartmentConvertMapper.toDto(sysDeptList);
-    List<SysDepartmentTreeVo> treeVos = new ArrayList<>();
-    for (SysDepartmentTreeVo treeVo : list) {
+    List<SysDeptTreeVo> list = sysDeptTreeConvertMapper.toDto(sysDeptList);
+    List<SysDeptTreeVo> treeVos = new ArrayList<>();
+    for (SysDeptTreeVo treeVo : list) {
       if (treeVo.getParentId() == null) {
         treeVos.add(findChildren(treeVo, list));
       }
@@ -113,8 +107,8 @@ public class SysDeptServiceImpl extends BaseServiceImpl<SysDeptMapper, SysDept> 
    * @param list
    * @return
    */
-  public SysDepartmentTreeVo findChildren(SysDepartmentTreeVo tree, List<SysDepartmentTreeVo> list) {
-    for (SysDepartmentTreeVo vo : list) {
+  public SysDeptTreeVo findChildren(SysDeptTreeVo tree, List<SysDeptTreeVo> list) {
+    for (SysDeptTreeVo vo : list) {
       if (tree.getId().equals(vo.getParentId())) {
         if (tree.getChildren() == null) {
           tree.setChildren(new ArrayList<>());

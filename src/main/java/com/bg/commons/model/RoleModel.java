@@ -1,4 +1,4 @@
-package com.bg.commons.vo;
+package com.bg.commons.model;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -12,7 +12,7 @@ import java.io.Serializable;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class RoleInfoVO implements Serializable {
+public class RoleModel implements Serializable {
 
   private String roleName;
 

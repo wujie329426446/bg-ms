@@ -3,7 +3,7 @@ package com.bg.auth.service.authentication;
 
 import com.bg.commons.enums.LoginTypeEnum;
 import com.bg.commons.model.UserModel;
-import com.bg.system.vo.SysUserSecurityVo;
+import com.bg.system.vo.SysUserVo;
 
 /**
  * 用户模型提供者
@@ -21,6 +21,6 @@ public interface UserModelProvider {
    * @param loginType 登陆类型
    * @return 用户模型
    */
-  UserModel createUserModel(SysUserSecurityVo user, String password, String account, LoginTypeEnum loginType) throws Exception;
+  UserModel createUserModel(SysUserVo user, String password, String account, LoginTypeEnum loginType) throws Exception;
 
 }

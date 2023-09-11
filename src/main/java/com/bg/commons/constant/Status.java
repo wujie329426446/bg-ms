@@ -5,19 +5,16 @@ package com.bg.commons.constant;
  *
  * @author Tang
  */
-public class Status {
-
-  private Status() {
-  }
+public interface Status {
 
   /**
    * 已停用
    */
-  public static final Integer DISABLED = 0;
+  Integer DISABLED = 0;
 
   /**
    * 已删除
    */
-  public static final Integer DELETED = 1;
+  Integer DELETED = 1;
 
 }

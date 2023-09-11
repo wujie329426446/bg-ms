@@ -2,8 +2,7 @@ package com.bg.system.convert;
 
 import com.bg.commons.convert.BaseConvertMapper;
 import com.bg.system.entity.SysDept;
-import com.bg.system.vo.SysDepartmentTreeVo;
-import java.util.List;
+import com.bg.system.vo.SysDeptTreeVo;
 import org.mapstruct.Mapper;
 
 /**
@@ -12,6 +11,6 @@ import org.mapstruct.Mapper;
  * @author jiewus
  **/
 @Mapper(componentModel = "spring")
-public interface SysDepartmentConvertMapper extends BaseConvertMapper<SysDepartmentTreeVo, SysDept> {
+public interface SysDeptTreeConvertMapper extends BaseConvertMapper<SysDeptTreeVo, SysDept> {
 
 }

@@ -3,25 +3,30 @@ package com.bg.system.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.bg.commons.api.ApiCode;
+import com.bg.commons.enums.StateEnum;
 import com.bg.commons.exception.BusinessException;
-import com.bg.commons.pagination.PageInfo;
-import com.bg.commons.pagination.Paging;
 import com.bg.commons.service.impl.BaseServiceImpl;
-import com.bg.system.mapper.SysRoleMapper;
+import com.bg.system.convert.SysRoleConvertMapper;
 import com.bg.system.entity.SysMenu;
 import com.bg.system.entity.SysRole;
 import com.bg.system.entity.SysRoleMenu;
-import com.bg.commons.enums.StateEnum;
+import com.bg.system.mapper.SysRoleMapper;
 import com.bg.system.param.sysrole.SysRolePageParam;
 import com.bg.system.param.sysrole.UpdateSysRolePermissionParam;
 import com.bg.system.service.SysMenuService;
 import com.bg.system.service.SysRoleMenuService;
 import com.bg.system.service.SysRoleService;
 import com.bg.system.vo.SysRoleVo;
+import java.io.Serializable;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.SetUtils;
@@ -30,12 +35,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.io.Serializable;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 
 /**
@@ -47,29 +46,31 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Service
+@Transactional(rollbackFor = Throwable.class)
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class SysRoleServiceImpl extends BaseServiceImpl<SysRoleMapper, SysRole> implements SysRoleService {
 
-  @Autowired
-  private SysRoleMapper sysRoleMapper;
+  private final SysRoleMapper sysRoleMapper;
 
-  @Autowired
-  private SysMenuService sysMenuService;
+  private final SysMenuService sysMenuService;
 
-  @Autowired
-  private SysRoleMenuService sysRoleMenuService;
+  private final SysRoleMenuService sysRoleMenuService;
+
+  private final SysRoleConvertMapper sysRoleConvertMapper;
+
 
   @Transactional(rollbackFor = Exception.class)
   @Override
-  public boolean saveSysRole(SysRole sysRole) throws Exception {
+  public boolean save(SysRole sysRole) {
     String code = sysRole.getRoleCode();
     // 校验角色标识code唯一性
-    if (isExistsByCode(code)) {
-      throw new BusinessException("角色编码已存在");
+    if (this.isExistsByCode(code)) {
+      throw BusinessException.build(ApiCode.BUSINESS_EXCEPTION.getCode(), "角色编码已存在");
     }
     // 保存角色
     boolean saveRoleResult = super.save(sysRole);
     if (!saveRoleResult) {
-      throw new BusinessException("保存角色失败");
+      throw BusinessException.build("保存角色失败");
     }
     return true;
   }
@@ -80,13 +81,13 @@ public class SysRoleServiceImpl extends BaseServiceImpl<SysRoleMapper, SysRole> 
     String roleId = sysRole.getId();
     // 校验角色是否存在
     if (getById(roleId) == null) {
-      throw new BusinessException("该角色不存在");
+      throw BusinessException.build("该角色不存在");
     }
     // 修改角色
 //        sysRole.setUpdateTime(new Date());
     boolean updateResult = updateById(sysRole);
     if (!updateResult) {
-      throw new BusinessException("修改系统角色失败");
+      throw BusinessException.build("修改系统角色失败");
     }
     return true;
   }
@@ -98,12 +99,12 @@ public class SysRoleServiceImpl extends BaseServiceImpl<SysRoleMapper, SysRole> 
     // TODO: 2023/6/26 判断该角色下是否有可用用户，如果有，则不能删除
     //        boolean isExistsUser = sysUserService.isExistsSysUserByRoleId(id);
     //        if (isExistsUser) {
-    //            throw new BusinessException("该角色下还存在可用用户，不能删除");
+    //            throw new BusinessException.build("该角色下还存在可用用户，不能删除");
     //        }
     // 角色真实删除
     boolean deleteRoleResult = removeById(id);
     if (!deleteRoleResult) {
-      throw new BusinessException("删除角色失败");
+      throw BusinessException.build("删除角色失败");
     }
 
     // 判断角色是否有权限，如果有，则删除
@@ -112,7 +113,7 @@ public class SysRoleServiceImpl extends BaseServiceImpl<SysRoleMapper, SysRole> 
       // 角色权限关系真实删除
       boolean deletePermissionResult = sysRoleMenuService.deleteSysRolePermissionByRoleId(id);
       if (!deletePermissionResult) {
-        throw new BusinessException("删除角色权限关系失败");
+        throw BusinessException.build("删除角色权限关系失败");
       }
     }
     return true;
@@ -122,7 +123,7 @@ public class SysRoleServiceImpl extends BaseServiceImpl<SysRoleMapper, SysRole> 
   public SysRoleVo getSysRoleById(Serializable id) throws Exception {
     SysRoleVo sysRoleVo = sysRoleMapper.getSysRoleById(id);
     if (sysRoleVo == null) {
-      throw new BusinessException("角色不存在");
+      throw BusinessException.build("角色不存在");
     }
     List<String> permissionIds = sysRoleMenuService.getPermissionIdsByRoleId((String) id);
     sysRoleVo.setPermissions(new HashSet<>(permissionIds));
@@ -130,14 +131,14 @@ public class SysRoleServiceImpl extends BaseServiceImpl<SysRoleMapper, SysRole> 
   }
 
   @Override
-  public Paging<SysRole> getSysRolePageList(SysRolePageParam sysRolePageParam) throws Exception {
-    Page<SysRole> page = new PageInfo<>(sysRolePageParam, OrderItem.desc("create_time"));
+  public Page<SysRole> getSysRolePageList(SysRolePageParam pageParam) throws Exception {
+    pageParam.pageSortsHandle(OrderItem.desc("create_time"));
     // 此处演示单表，使用mybatisplus自带方法进行分页
     LambdaQueryWrapper<SysRole> lambdaQueryWrapper = new LambdaQueryWrapper<>();
-    String keyword = sysRolePageParam.getKeyword();
-    String name = sysRolePageParam.getName();
-    String code = sysRolePageParam.getCode();
-    Integer state = sysRolePageParam.getState();
+    String keyword = pageParam.getKeyword();
+    String name = pageParam.getName();
+    String code = pageParam.getCode();
+    Integer state = pageParam.getState();
     if (StringUtils.isNotBlank(keyword)) {
       lambdaQueryWrapper
           .like(SysRole::getRoleName, keyword)
@@ -153,8 +154,8 @@ public class SysRoleServiceImpl extends BaseServiceImpl<SysRoleMapper, SysRole> 
     if (state != null) {
       lambdaQueryWrapper.eq(SysRole::getStatus, state);
     }
-    IPage<SysRole> iPage = sysRoleMapper.selectPage(page, lambdaQueryWrapper);
-    return new Paging<SysRole>(iPage);
+    Page<SysRole> page = sysRoleMapper.selectPage(pageParam.getPage(), lambdaQueryWrapper);
+    return page;
   }
 
   @Override
@@ -168,7 +169,7 @@ public class SysRoleServiceImpl extends BaseServiceImpl<SysRoleMapper, SysRole> 
   }
 
   @Override
-  public boolean isExistsByCode(String code) throws Exception {
+  public boolean isExistsByCode(String code) {
     SysRole sysRole = new SysRole().setRoleCode(code);
     return sysRoleMapper.selectCount(new QueryWrapper<>(sysRole)) > 0;
   }
@@ -180,12 +181,12 @@ public class SysRoleServiceImpl extends BaseServiceImpl<SysRoleMapper, SysRole> 
     // 校验角色是否存在
     SysRole sysRole = getById(roleId);
     if (sysRole == null) {
-      throw new BusinessException("该角色不存在");
+      throw BusinessException.build("该角色不存在");
     }
     if (CollectionUtils.isNotEmpty(permissionIds)) {
       // 校验权限列表是否存在
       if (!sysMenuService.isExistsByPermissionIds(permissionIds)) {
-        throw new BusinessException("权限列表id匹配失败");
+        throw BusinessException.build("权限列表id匹配失败");
       }
     }
     // 获取之前的权限id集合
@@ -209,7 +210,7 @@ public class SysRoleServiceImpl extends BaseServiceImpl<SysRoleMapper, SysRole> 
       updateWrapper.in(SysRoleMenu::getPermissionId, deleteSet);
       boolean deleteResult = sysRoleMenuService.remove(updateWrapper);
       if (!deleteResult) {
-        throw new BusinessException("删除角色权限关系失败");
+        throw BusinessException.build("删除角色权限关系失败");
       }
     }
 
@@ -217,7 +218,7 @@ public class SysRoleServiceImpl extends BaseServiceImpl<SysRoleMapper, SysRole> 
       // 新增权限关联
       boolean addResult = sysRoleMenuService.saveSysRolePermissionBatch(roleId, addSet);
       if (!addResult) {
-        throw new BusinessException("新增角色权限关系失败");
+        throw BusinessException.build("新增角色权限关系失败");
       }
     }
 
@@ -239,15 +240,12 @@ public class SysRoleServiceImpl extends BaseServiceImpl<SysRoleMapper, SysRole> 
     return roleList.stream().map(SysRole::getId).collect(Collectors.toList());
   }
 
-  /**
-   * 根据用户主键获取角色集合
-   *
-   * @param userId 用户主键
-   * @return 角色集合
-   */
   @Override
-  public Set<String> getRolesByUserId(String userId) {
+  public List<SysRoleVo> getRolesByUserId(String userId) {
     List<SysRole> roleList = sysRoleMapper.selectRoleListByUserId(userId);
-    return roleList.stream().map(SysRole::getRoleCode).collect(Collectors.toSet());
+    List<SysRoleVo> roleVoList = sysRoleConvertMapper.toDto(roleList);
+    return roleVoList;
   }
+
+
 }

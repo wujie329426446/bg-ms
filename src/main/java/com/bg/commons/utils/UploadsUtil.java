@@ -3,11 +3,10 @@ package com.bg.commons.utils;
 import com.bg.commons.constant.UploadsPrefix;
 import com.bg.commons.exception.BusinessException;
 import com.bg.config.properties.BgProperties;
-import org.springframework.web.multipart.MultipartFile;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.Objects;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * 文件上传工具类
@@ -83,10 +82,10 @@ public class UploadsUtil {
       fileName = "unknown-file-name";
     }
     if (fileName.length() > MAX_FILE_NAME_LENGTH) {
-      throw new BusinessException("上传失败, 文件名最大长度为: " + MAX_FILE_NAME_LENGTH);
+      throw BusinessException.build("上传失败, 文件名最大长度为: " + MAX_FILE_NAME_LENGTH);
     }
     if (file.getSize() > MAX_FILE_SIZE) {
-      throw new BusinessException("上传失败, 文件最大大小为: " + ByteUtils.getSize(MAX_FILE_SIZE));
+      throw BusinessException.build("上传失败, 文件最大大小为: " + ByteUtils.getSize(MAX_FILE_SIZE));
     }
     fileName = System.currentTimeMillis() + "_" + fileName;
     File destDir = new File(path);

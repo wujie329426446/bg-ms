@@ -4,11 +4,10 @@ package com.bg.service;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.bg.system.entity.SysRole;
 import com.bg.system.service.SysRoleService;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-
-import java.util.List;
 
 @SpringBootTest
 public class SysRoleServiceTests {
@@ -31,7 +30,7 @@ public class SysRoleServiceTests {
     SysRole sysRole = new SysRole();
     sysRole.setRoleName("角色管理员");
     sysRole.setRoleCode("role");
-    sysRole.setDescription("角色管理员");
+    sysRole.setRemark("角色管理员");
     sysRoleService.save(sysRole);
   }
 
@@ -39,7 +38,7 @@ public class SysRoleServiceTests {
   @Test
   public void update() {
     SysRole sysRole = sysRoleService.getById(1);
-    sysRole.setDescription("test");
+    sysRole.setRemark("test");
     sysRoleService.updateById(sysRole);
   }
 

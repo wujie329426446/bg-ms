@@ -10,6 +10,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -87,10 +88,18 @@ public class ApiResult<T> implements Serializable {
   }
 
   public static ApiResult fail(ApiCode apiCode, String message) {
+    return result(apiCode, message);
+  }
+
+  public static ApiResult fail(Integer code, String message) {
+    ApiCode apiCode = ApiCode.getApiCode(code);
+    if (Objects.isNull(apiCode)) {
+      throw new RuntimeException("状态码不存在");
+    }
     if (ApiCode.SUCCESS == apiCode) {
       throw new RuntimeException("失败结果状态码不能为" + ApiCode.SUCCESS.getCode());
     }
-    return result(apiCode, message, null);
+    return fail(apiCode, message);
   }
 
   public static ApiResult result(boolean flag) {
@@ -115,12 +124,11 @@ public class ApiResult<T> implements Serializable {
   }
 
   public static ApiResult result(ApiCode apiCode, String message, Object data) {
-    if (apiCode == null) {
+    if (Objects.isNull(apiCode)) {
       throw new RuntimeException("结果状态码不能为空");
     }
     boolean success = false;
-    int code = apiCode.getCode();
-    if (ApiCode.SUCCESS.getCode() == code) {
+    if (ApiCode.SUCCESS == apiCode) {
       success = true;
     }
     String outMessage;
@@ -131,13 +139,18 @@ public class ApiResult<T> implements Serializable {
     }
     String traceId = MDC.get(CommonConstant.TRACE_ID);
     return ApiResult.builder()
-        .code(code)
+        .code(apiCode.getCode())
         .message(outMessage)
         .data(data)
         .success(success)
         .time(new Date())
         .traceId(traceId)
         .build();
+  }
+
+  public static ApiResult result(Integer code, String message, Object data) {
+    ApiCode apiCode = ApiCode.getApiCode(code);
+    return result(apiCode, message, data);
   }
 
 }
