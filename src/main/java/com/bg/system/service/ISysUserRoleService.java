@@ -1,6 +1,6 @@
 package com.bg.system.service;
 
-import com.bg.commons.service.BaseService;
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.bg.system.entity.SysUserRole;
 
 /**
@@ -10,6 +10,6 @@ import com.bg.system.entity.SysUserRole;
  *
  * @author jiewus
  */
-public interface SysUserRoleService extends BaseService<SysUserRole> {
+public interface ISysUserRoleService extends IService<SysUserRole> {
 
 }

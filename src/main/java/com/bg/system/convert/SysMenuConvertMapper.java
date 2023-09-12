@@ -12,6 +12,6 @@ import org.mapstruct.Mapper;
  * @author jiewus
  **/
 @Mapper(componentModel = "spring")
-public interface SysPermissionConvertMapper extends BaseConvertMapper<SysPermissionTreeVo, SysMenu> {
+public interface SysMenuConvertMapper extends BaseConvertMapper<SysPermissionTreeVo, SysMenu> {
 
 }

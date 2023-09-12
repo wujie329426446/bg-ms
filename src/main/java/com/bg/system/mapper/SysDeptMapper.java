@@ -3,7 +3,7 @@ package com.bg.system.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.bg.system.entity.SysDept;
-import com.bg.system.param.SysDepartmentPageParam;
+import com.bg.system.param.DeptPageParam;
 import com.bg.system.vo.SysDeptVo;
 import org.apache.ibatis.annotations.Param;
 
@@ -24,6 +24,6 @@ public interface SysDeptMapper extends BaseMapper<SysDept> {
    * @param sysDepartmentPageParam
    * @return
    */
-  Page<SysDeptVo> getSysDeptPageList(@Param("page") Page page, @Param("param") SysDepartmentPageParam pageParam);
+  Page<SysDeptVo> getSysDeptPageList(@Param("page") Page page, @Param("param") DeptPageParam pageParam);
 
 }

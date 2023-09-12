@@ -40,12 +40,12 @@ public abstract class BaseEntity<T extends Model<?>> extends Model<T> implements
   @TableId(value = "id", type = IdType.ASSIGN_UUID)
   private String id;
 
-  @Schema(description = "版本")
+  @Schema(description = "版本（版本不用传）", hidden = true)
   @Null(message = "版本不用传")
   @Version
   private Integer version;
 
-  @Schema(description = "创建时间")
+  @Schema(description = "创建时间", hidden = true)
   @TableField(fill = FieldFill.INSERT)
   @Null(message = "创建时间不用传")
   @JsonDeserialize(using = LocalDateTimeDeserializer.class)
@@ -53,15 +53,15 @@ public abstract class BaseEntity<T extends Model<?>> extends Model<T> implements
   @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
   private LocalDateTime createTime;
 
-  @Schema(description = "创建人")
+  @Schema(description = "创建人", hidden = true)
   @TableField(value = "creator_id", fill = FieldFill.INSERT)
   private Long creatorId;
 
-  @Schema(description = "创建人姓名")
+  @Schema(description = "创建人姓名", hidden = true)
   @TableField(value = "creator_name", fill = FieldFill.INSERT)
   private String creatorName;
 
-  @Schema(description = "修改时间")
+  @Schema(description = "修改时间", hidden = true)
   @TableField(fill = FieldFill.INSERT_UPDATE)
   @Null(message = "修改时间不用传")
   @JsonDeserialize(using = LocalDateTimeDeserializer.class)
@@ -69,11 +69,11 @@ public abstract class BaseEntity<T extends Model<?>> extends Model<T> implements
   @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
   private LocalDateTime updateTime;
 
-  @Schema(description = "修改人")
+  @Schema(description = "修改人", hidden = true)
   @TableField(value = "update_id", fill = FieldFill.INSERT_UPDATE)
   private Integer updateId;
 
-  @Schema(description = "修改人姓名")
+  @Schema(description = "修改人姓名", hidden = true)
   @TableField(value = "update_name", fill = FieldFill.INSERT_UPDATE)
   private String updateName;
 
@@ -85,7 +85,7 @@ public abstract class BaseEntity<T extends Model<?>> extends Model<T> implements
   @TableField("status")
   private Integer status;
 
-  @Schema(description = "逻辑删除")
+  @Schema(description = "逻辑删除", hidden = true)
   @TableField("deleted")
   // 逻辑删除 默认效果 0 没有删除 1 已经删除
   @TableLogic

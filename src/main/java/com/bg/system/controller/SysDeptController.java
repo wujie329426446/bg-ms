@@ -6,8 +6,8 @@ import com.bg.commons.controller.BaseController;
 import com.bg.commons.log.annotation.OperationLog;
 import com.bg.commons.log.enums.OperationLogType;
 import com.bg.system.entity.SysDept;
-import com.bg.system.param.SysDepartmentPageParam;
-import com.bg.system.service.SysDeptService;
+import com.bg.system.param.DeptPageParam;
+import com.bg.system.service.ISysDeptService;
 import com.bg.system.vo.SysDeptTreeVo;
 import com.bg.system.vo.SysDeptVo;
 import io.swagger.v3.oas.annotations.Operation;
@@ -34,7 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/v1/api/admin/sysDepartment")
 @Tag(name = "系统部门API")
-public class SysDepartmentController extends BaseController<SysDept, SysDeptService, SysDept> {
+public class SysDeptController extends BaseController<SysDept, ISysDeptService, SysDept> {
 
   /**
    * 添加部门
@@ -91,7 +91,7 @@ public class SysDepartmentController extends BaseController<SysDept, SysDeptServ
   @PreAuthorize("@auth.hasPermission('sys:department:page')")
   @OperationLog(name = "部门分页列表", type = OperationLogType.PAGE)
   @Operation(summary = "部门分页列表")
-  public ApiResult<Page<SysDeptVo>> getSysDepartmentPageList(@Validated @RequestBody SysDepartmentPageParam pageParam) throws Exception {
+  public ApiResult<Page<SysDeptVo>> getSysDepartmentPageList(@Validated @RequestBody DeptPageParam pageParam) throws Exception {
     Page<SysDeptVo> page = baseService.getSysDepartmentPageList(pageParam);
     return ApiResult.success(page);
   }

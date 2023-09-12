@@ -2,9 +2,9 @@ package com.bg.system.service;
 
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.bg.commons.service.BaseService;
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.bg.system.entity.SysMenu;
-import com.bg.system.param.SysPermissionPageParam;
+import com.bg.system.param.MenuPageParam;
 import com.bg.system.vo.SysPermissionTreeVo;
 import com.bg.system.vo.SysPermissionVo;
 import java.io.Serializable;
@@ -18,7 +18,7 @@ import java.util.Set;
  *
  * @author jiewus
  */
-public interface SysMenuService extends BaseService<SysMenu> {
+public interface ISysMenuService extends IService<SysMenu> {
 
   /**
    * 保存
@@ -45,7 +45,7 @@ public interface SysMenuService extends BaseService<SysMenu> {
    * @return
    * @throws Exception
    */
-  boolean deleteSysPermission(String id) throws Exception;
+  boolean deleteSysPermission(String id);
 
   /**
    * 根据ID获取查询对象
@@ -59,11 +59,11 @@ public interface SysMenuService extends BaseService<SysMenu> {
   /**
    * 获取分页对象
    *
-   * @param sysPermissionPageParam
+   * @param menuPageParam
    * @return
    * @throws Exception
    */
-  Page<SysPermissionVo> getSysPermissionPageList(SysPermissionPageParam sysPermissionPageParam) throws Exception;
+  Page<SysPermissionVo> getSysPermissionPageList(MenuPageParam menuPageParam) throws Exception;
 
   /**
    * 判断权限id是否存在
@@ -135,6 +135,14 @@ public interface SysMenuService extends BaseService<SysMenu> {
    */
   List<String> getPermissionIdsByRoleId(String roleId) throws Exception;
 
+  /**
+   * 根据角色id获取该对应的所有三级权限ID
+   *
+   * @param roleId
+   * @return
+   * @throws Exception
+   */
+  List<String> getThreeLevelPermissionIdsByRoleId(String roleId);
 
   /**
    * 获取所有导航菜单(一级/二级菜单)
@@ -143,4 +151,13 @@ public interface SysMenuService extends BaseService<SysMenu> {
    * @throws Exception
    */
   List<SysPermissionTreeVo> getNavMenuTree() throws Exception;
+
+
+  /**
+   * 查询角色关联的菜单
+   *
+   * @return
+   */
+  List<SysMenu> listRoleMenus(String roleId);
+
 }

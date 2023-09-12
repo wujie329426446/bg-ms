@@ -3,7 +3,7 @@ package com.bg.system.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.bg.system.entity.SysMenu;
-import com.bg.system.param.SysPermissionPageParam;
+import com.bg.system.param.MenuPageParam;
 import com.bg.system.vo.SysPermissionVo;
 import java.io.Serializable;
 import java.util.List;
@@ -31,10 +31,10 @@ public interface SysMenuMapper extends BaseMapper<SysMenu> {
    * 获取分页对象
    *
    * @param page
-   * @param sysPermissionPageParam
+   * @param menuPageParam
    * @return
    */
-  Page<SysPermissionVo> getSysPermissionPageList(@Param("page") Page page, @Param("param") SysPermissionPageParam sysPermissionPageParam);
+  Page<SysPermissionVo> getSysPermissionPageList(@Param("page") Page page, @Param("param") MenuPageParam menuPageParam);
 
   /**
    * 根据用户id获取该用户所有权限编码
@@ -52,4 +52,13 @@ public interface SysMenuMapper extends BaseMapper<SysMenu> {
    * @return
    */
   List<SysMenu> getMenuListByUserId(@Param("userId") String userId);
+
+
+  /**
+   * 根据角色id获取该对应的所有三级权限ID
+   *
+   * @param roleId
+   * @return
+   */
+  List<String> getThreeLevelPermissionIdsByRoleId(@Param("roleId") String roleId);
 }

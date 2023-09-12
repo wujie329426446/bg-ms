@@ -9,9 +9,10 @@ import com.bg.commons.core.validator.groups.Query;
 import com.bg.commons.core.validator.groups.Update;
 import com.bg.commons.log.annotation.OperationLog;
 import com.bg.commons.log.enums.OperationLogType;
+import com.bg.framework.prefix.AdminApiRestController;
 import com.bg.system.entity.SysUser;
 import com.bg.system.param.UserPageParam;
-import com.bg.system.service.SysUserService;
+import com.bg.system.service.ISysUserService;
 import com.bg.system.vo.RouteItemVO;
 import com.bg.system.vo.SysUserVo;
 import io.swagger.v3.oas.annotations.Hidden;
@@ -30,25 +31,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 
-/**
- * 系统用户 前端控制器
- *
- * @author jiewus
- */
 @Slf4j
-@RestController
+@AdminApiRestController
 @Tag(name = "系统用户API")
-@RequestMapping("/v1/api/admin/user")
+@RequestMapping("/user")
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-public class SysUserController extends BaseController<SysUser, SysUserService, UserPageParam> {
+public class SysUserController extends BaseController<SysUser, ISysUserService, UserPageParam> {
 
   @PostMapping("/add")
   @PreAuthorize("@auth.hasPermission('sys:user:add')")
@@ -96,7 +92,7 @@ public class SysUserController extends BaseController<SysUser, SysUserService, U
 
   @GetMapping("/detail")
   @PreAuthorize("@auth.hasPermission('sys:user:info')")
-  @OperationLog(name = "系统用户分页列表", type = OperationLogType.INFO)
+  @OperationLog(name = "系统用户详情查看", type = OperationLogType.INFO)
   @Operation(
       summary = "系统用户详情查看",
       parameters = {
@@ -128,6 +124,26 @@ public class SysUserController extends BaseController<SysUser, SysUserService, U
     return ApiResult.success(sysUserVo);
   }
 
+  @DeleteMapping("/delete/{id}")
+  @PreAuthorize("@auth.hasPermission('sys:user:delete')")
+  @OperationLog(name = "删除系统用户", type = OperationLogType.DELETE)
+  @Operation(
+      summary = "删除系统用户",
+      parameters = {
+          @Parameter(
+              description = "主键id",
+              in = ParameterIn.PATH,
+              name = "id",
+              required = true
+          )
+      },
+      security = {@SecurityRequirement(name = LoginConstant.BG_HEADER)}
+  )
+  public ApiResult<Boolean> deleteSysUser(@PathVariable("id") String id) {
+    boolean flag = baseService.removeById(id);
+    return ApiResult.result(flag);
+  }
+
   @PostMapping("/getPageList")
   @PreAuthorize("@auth.hasPermission('sys:user:page')")
   @OperationLog(name = "系统用户分页列表", type = OperationLogType.PAGE)
@@ -150,8 +166,8 @@ public class SysUserController extends BaseController<SysUser, SysUserService, U
               content = @Content(
                   mediaType = MediaType.APPLICATION_JSON_VALUE,
                   schema = @Schema(
-                      title = "ApiResult、Page、SysUserQueryVo组合模型",
-                      description = "返回实体，ApiResult内data为SysUserQueryVo类型的Page对象",
+                      title = "ApiResult、Page、SysUserVo组合模型",
+                      description = "返回实体，ApiResult内data为SysUserVo类型的Page对象",
                       anyOf = {ApiResult.class, Page.class, SysUserVo.class}
                   )
               )
@@ -159,29 +175,9 @@ public class SysUserController extends BaseController<SysUser, SysUserService, U
       },
       security = {@SecurityRequirement(name = LoginConstant.BG_HEADER)}
   )
-  public ApiResult<Page<SysUserVo>> getPageList(@Validated(Query.class) @RequestBody UserPageParam pageParam) throws Exception {
-    Page<SysUserVo> paging = baseService.getPageList(pageParam);
-    return ApiResult.success(paging);
-  }
-
-  @GetMapping("/delete/{id}")
-  @PreAuthorize("@auth.hasPermission('sys:user:delete')")
-  @OperationLog(name = "删除系统用户", type = OperationLogType.DELETE)
-  @Operation(
-      summary = "删除系统用户",
-      parameters = {
-          @Parameter(
-              description = "主键id",
-              in = ParameterIn.PATH,
-              name = "id",
-              required = true
-          )
-      },
-      security = {@SecurityRequirement(name = LoginConstant.BG_HEADER)}
-  )
-  public ApiResult<Boolean> deleteSysUser(@PathVariable("id") String id) {
-    boolean flag = baseService.removeById(id);
-    return ApiResult.result(flag);
+  public ApiResult<Page<SysUserVo>> getUserPageList(@Validated(Query.class) @RequestBody UserPageParam pageParam) {
+    Page<SysUserVo> page = baseService.getUserPageList(pageParam);
+    return ApiResult.success(page);
   }
 
   @Hidden

@@ -1,11 +1,14 @@
 package com.bg.system.service.impl;
 
-import com.bg.commons.service.impl.BaseServiceImpl;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.bg.system.entity.SysUserRole;
 import com.bg.system.mapper.SysUserRoleMapper;
-import com.bg.system.service.SysUserRoleService;
+import com.bg.system.service.ISysUserRoleService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 
 /**
@@ -17,6 +20,8 @@ import org.springframework.stereotype.Service;
  */
 @Slf4j
 @Service
-public class SysUserRoleServiceImpl extends BaseServiceImpl<SysUserRoleMapper, SysUserRole> implements SysUserRoleService {
+@Transactional(rollbackFor = Throwable.class)
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
+public class SysUserRoleServiceImpl extends ServiceImpl<SysUserRoleMapper, SysUserRole> implements ISysUserRoleService {
 
 }

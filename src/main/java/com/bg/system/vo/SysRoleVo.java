@@ -2,13 +2,13 @@ package com.bg.system.vo;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.io.Serial;
+import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
 import lombok.Data;
 import lombok.ToString;
 import lombok.experimental.Accessors;
-
-import java.io.Serializable;
-import java.util.Set;
 
 /**
  * <pre>
@@ -23,6 +23,7 @@ import java.util.Set;
 @Schema(description = "系统角色查询参数")
 public class SysRoleVo implements Serializable {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   @Schema(description = "主键")
@@ -43,9 +44,6 @@ public class SysRoleVo implements Serializable {
   @Schema(description = "备注")
   private String remark;
 
-  @Schema(description = "版本")
-  private Integer version;
-
   @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
   @Schema(description = "创建时间")
   private LocalDateTime createTime;
@@ -55,6 +53,6 @@ public class SysRoleVo implements Serializable {
   private LocalDateTime updateTime;
 
   @Schema(description = "权限集合")
-  private Set<String> permissions;
+  private List<String> permissions;
 
 }

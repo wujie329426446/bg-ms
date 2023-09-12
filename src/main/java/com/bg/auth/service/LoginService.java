@@ -7,7 +7,7 @@ import com.bg.commons.enums.LoginTypeEnum;
 import com.bg.commons.exception.BusinessException;
 import com.bg.commons.model.LoginModel;
 import com.bg.commons.model.UserModel;
-import com.bg.system.service.SysLogLoginService;
+import com.bg.system.service.ISysLogLoginService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -28,9 +28,9 @@ public class LoginService {
 
   private final TokenService tokenService;
 
-  private final SysLogLoginService logLoginService;
+  private final ISysLogLoginService logLoginService;
 
-  public LoginService(AuthenticationManager authenticationManager, TokenService tokenService, SysLogLoginService logLoginService) {
+  public LoginService(AuthenticationManager authenticationManager, TokenService tokenService, ISysLogLoginService logLoginService) {
     this.authenticationManager = authenticationManager;
     this.tokenService = tokenService;
     this.logLoginService = logLoginService;

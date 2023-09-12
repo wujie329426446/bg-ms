@@ -17,7 +17,7 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = true)
 @Schema(description = "系统日志查询参数")
-public class SysLogQuery extends BasePageParam {
+public class LogPageParam extends BasePageParam {
 
   @Serial
   private static final long serialVersionUID = 1L;

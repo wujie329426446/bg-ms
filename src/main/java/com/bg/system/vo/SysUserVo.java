@@ -94,8 +94,4 @@ public class SysUserVo implements Serializable {
   @Schema(description = "修改时间")
   private LocalDateTime updateTime;
 
-  @Schema(description = "删除标识")
-  private Integer deleted;
-
-
 }

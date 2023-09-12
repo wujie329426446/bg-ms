@@ -1,17 +1,16 @@
 package com.bg.system.service;
 
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.bg.commons.enums.LoginTypeEnum;
 import com.bg.commons.model.UserModel;
-import com.bg.commons.service.BaseService;
 import com.bg.system.entity.SysLogLogin;
-import java.util.List;
 
 /**
  * 登陆日志业务逻辑层接口
  *
  * @author jiewus
  */
-public interface SysLogLoginService extends BaseService<SysLogLogin> {
+public interface ISysLogLoginService extends IService<SysLogLogin> {
 
   /**
    * 记录登陆信息

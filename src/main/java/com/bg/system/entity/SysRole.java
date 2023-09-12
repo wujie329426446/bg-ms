@@ -7,6 +7,7 @@ import com.bg.commons.entity.BaseEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import java.io.Serial;
+import java.util.List;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -30,11 +31,16 @@ public class SysRole extends BaseEntity<SysRole> {
   private String roleName;
 
   @Schema(description = "角色唯一编码")
+  @NotBlank(message = "角色编码不能为空", groups = {Add.class})
   @TableField("role_code")
   private String roleCode;
 
   @Schema(description = "角色类型")
   @TableField("type")
   private Integer type;
+
+  @Schema(description = "权限集合")
+  @TableField(exist = false)
+  private List<String> permissions;
 
 }

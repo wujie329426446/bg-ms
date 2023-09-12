@@ -15,22 +15,22 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-@Schema(description = "用户列表参数")
+@Schema(description = "系统角色查询参数")
 public class RolePageParam extends BasePageParam {
 
   @Serial
   private static final long serialVersionUID = 1L;
 
-  @Schema(description = "搜索词")
-  private String criteria;
+  @Schema(description = "角色id")
+  private String roleId;
 
-  @Schema(description = "项目")
-  private String projectType;
+  @Schema(description = "角色名称")
+  private String roleName;
 
-  private Integer userId;
+  @Schema(description = "角色类型")
+  private String roleCode;
 
-  private Integer roleType;
-
-  private Integer userType;
+  @Schema(description = "角色状态，0：禁用，1：启用")
+  private Integer state;
 
 }

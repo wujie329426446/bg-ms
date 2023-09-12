@@ -27,6 +27,10 @@ public enum OperationLogType implements BaseEnum {
    **/
   DELETE(3, "删除"),
   /**
+   * 删除
+   **/
+  BATCH_DELETE(31, "批量删除"),
+  /**
    * 查询
    **/
   query(4, "详情查询"),

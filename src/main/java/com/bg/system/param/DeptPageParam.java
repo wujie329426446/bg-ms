@@ -1,4 +1,4 @@
-package com.bg.system.param.sysrole;
+package com.bg.system.param;
 
 import com.bg.commons.pagination.BasePageParam;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -9,7 +9,7 @@ import lombok.experimental.Accessors;
 
 /**
  * <pre>
- * 角色权限关系 查询参数对象
+ * 部门 查询参数对象
  * </pre>
  *
  * @author jiewus
@@ -17,8 +17,8 @@ import lombok.experimental.Accessors;
 @Data
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = true)
-@Schema(description = "角色权限关系查询参数")
-public class SysRolePermissionPageParam extends BasePageParam {
+@Schema(description = "部门查询参数")
+public class DeptPageParam extends BasePageParam {
 
   @Serial
   private static final long serialVersionUID = 1L;

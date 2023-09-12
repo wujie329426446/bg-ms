@@ -3,6 +3,7 @@ package com.bg.auth.controller;
 import com.bg.auth.service.LoginService;
 import com.bg.commons.api.ApiResult;
 import com.bg.commons.model.LoginModel;
+import com.bg.framework.prefix.AdminApiRestController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -16,7 +17,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 /**
  * 登录控制器
@@ -24,9 +24,9 @@ import org.springframework.web.bind.annotation.RestController;
  * @author jiewus
  */
 @Slf4j
-@RestController
+@AdminApiRestController
 @Tag(name = "系统登录API")
-@RequestMapping("/v1/api/admin")
+@RequestMapping()
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class LoginController {
 

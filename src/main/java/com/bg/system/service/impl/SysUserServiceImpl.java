@@ -7,10 +7,10 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.bg.commons.api.ApiCode;
 import com.bg.commons.exception.BusinessException;
 import com.bg.commons.model.RoleModel;
-import com.bg.commons.service.impl.BaseServiceImpl;
 import com.bg.commons.utils.PhoneUtil;
 import com.bg.commons.utils.SecurityUtil;
 import com.bg.config.properties.BgProperties;
@@ -25,10 +25,10 @@ import com.bg.system.enums.LinkExternalEnum;
 import com.bg.system.enums.MenuLevelEnum;
 import com.bg.system.mapper.SysUserMapper;
 import com.bg.system.param.UserPageParam;
-import com.bg.system.service.SysMenuService;
-import com.bg.system.service.SysRoleService;
-import com.bg.system.service.SysUserRoleService;
-import com.bg.system.service.SysUserService;
+import com.bg.system.service.ISysMenuService;
+import com.bg.system.service.ISysRoleService;
+import com.bg.system.service.ISysUserRoleService;
+import com.bg.system.service.ISysUserService;
 import com.bg.system.vo.RouteItemVO;
 import com.bg.system.vo.RouteMetoVO;
 import com.bg.system.vo.SysRoleVo;
@@ -52,26 +52,17 @@ import org.springframework.transaction.annotation.Transactional;
  *
  * @author jiewus
  */
-@Service("usersService")
+@Service
 @Slf4j
 @Transactional(rollbackFor = Throwable.class)
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-public class SysUserServiceImpl extends BaseServiceImpl<SysUserMapper, SysUser> implements SysUserService {
+public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> implements ISysUserService {
 
   private final BgProperties bgProperties;
-  private final SysUserMapper sysUserMapper;
-  private final SysUserRoleService sysUserRoleService;
-  private final SysRoleService sysRoleService;
-  private final SysMenuService sysMenuService;
+  private final ISysUserRoleService ISysUserRoleService;
+  private final ISysRoleService ISysRoleService;
+  private final ISysMenuService ISysMenuService;
   private final SysUserConvertMapper sysUserConvertMapper;
-
-  @Transactional(rollbackFor = Exception.class)
-  @Override
-  public boolean removeById(Serializable id) {
-    // 删除用户与角色关联
-    sysUserRoleService.remove(Wrappers.lambdaQuery(SysUserRole.class).eq(SysUserRole::getUserId, id));
-    return super.removeById(id);
-  }
 
   @Transactional(rollbackFor = Exception.class)
   @Override
@@ -93,19 +84,16 @@ public class SysUserServiceImpl extends BaseServiceImpl<SysUserMapper, SysUser> 
       sysUser.setAvatar(bgProperties.getLoginInitHead());
     }
 
-    sysUser.insert();
-
-    // 新增用户与角色关联
-    if (Objects.nonNull(sysUser.getRoleIds())) {
-      List<SysUserRole> sysUserRoleList = sysUser.getRoleIds().stream().map(item -> {
-        SysUserRole sysUserRole = new SysUserRole();
-        sysUserRole.setUserId(sysUser.getId());
-        sysUserRole.setRoleId(item);
-        return sysUserRole;
-      }).collect(Collectors.toList());
-      sysUserRoleService.saveBatch(sysUserRoleList);
+    boolean insert = sysUser.insert();
+    if (insert) {
+      // 新增用户与角色关联
+      List<String> roleIds = sysUser.getRoleIds();
+      if (CollectionUtils.isNotEmpty(roleIds)) {
+        roleIds.stream().forEach(item -> new SysUserRole().setUserId(sysUser.getId()).setRoleId(item).insert());
+      }
     }
-    return true;
+
+    return insert;
   }
 
   @Transactional(rollbackFor = Exception.class)
@@ -116,17 +104,12 @@ public class SysUserServiceImpl extends BaseServiceImpl<SysUserMapper, SysUser> 
     this.saveOrUpdateCheck(sysUser, FieldFill.UPDATE);
 
     // 删除用户与角色关联
-    sysUserRoleService.remove(Wrappers.lambdaQuery(SysUserRole.class).eq(SysUserRole::getUserId, userId));
+    ISysUserRoleService.remove(Wrappers.lambdaQuery(SysUserRole.class).eq(SysUserRole::getUserId, userId));
 
     // 新增用户与角色关联
-    if (Objects.nonNull(sysUser.getRoleIds())) {
-      List<SysUserRole> sysUserRoleList = sysUser.getRoleIds().stream().map(item -> {
-        SysUserRole sysUserRole = new SysUserRole();
-        sysUserRole.setUserId(userId);
-        sysUserRole.setRoleId(item);
-        return sysUserRole;
-      }).collect(Collectors.toList());
-      sysUserRoleService.saveBatch(sysUserRoleList);
+    List<String> roleIds = sysUser.getRoleIds();
+    if (CollectionUtils.isNotEmpty(roleIds)) {
+      roleIds.stream().forEach(item -> new SysUserRole().setUserId(userId).setRoleId(item).insert());
     }
 
     return super.updateById(sysUser);
@@ -167,21 +150,24 @@ public class SysUserServiceImpl extends BaseServiceImpl<SysUserMapper, SysUser> 
     // 手机号码脱敏处理
     sysUserVo.setPhone(PhoneUtil.desensitize(sysUserVo.getPhone()));
     // 获取关联角色集合
-    List<SysRoleVo> roleList = sysRoleService.getRolesByUserId(id);
+    List<SysRoleVo> roleList = ISysRoleService.getRolesByUserId(id);
     sysUserVo.setRoles(roleList.stream().map(SysRoleVo::getRoleCode).collect(Collectors.toSet()));
     sysUserVo.setRoleList(roleList);
     return sysUserVo;
   }
 
+  @Transactional(rollbackFor = Exception.class)
   @Override
-  public SysUserVo selectUserByUsername(String username) {
-    return sysUserMapper.selectUserByUsername(username);
+  public boolean removeById(Serializable id) {
+    // 删除用户与角色关联
+    ISysUserRoleService.remove(Wrappers.lambdaQuery(SysUserRole.class).eq(SysUserRole::getUserId, id));
+    return super.removeById(id);
   }
 
   @Override
-  public Page<SysUserVo> getPageList(UserPageParam pageParam) {
+  public Page<SysUserVo> getUserPageList(UserPageParam pageParam) {
     pageParam.pageSortsHandle(OrderItem.desc("create_time"));
-    Page<SysUserVo> page = sysUserMapper.getSysUserPageList(pageParam.getPage(), pageParam);
+    Page<SysUserVo> page = baseMapper.getSysUserPageList(pageParam.getPage(), pageParam);
 
     if (Objects.nonNull(page) && CollectionUtils.isNotEmpty(page.getRecords())) {
       // 手机号码脱敏处理
@@ -189,12 +175,17 @@ public class SysUserServiceImpl extends BaseServiceImpl<SysUserMapper, SysUser> 
 
       // 获取角色
       page.getRecords().forEach(item -> {
-        List<SysRoleVo> roleList = sysRoleService.getRolesByUserId(item.getId());
+        List<SysRoleVo> roleList = ISysRoleService.getRolesByUserId(item.getId());
         item.setRoles(roleList.stream().map(SysRoleVo::getRoleCode).collect(Collectors.toSet()));
         item.setRoleList(roleList);
       });
     }
     return page;
+  }
+
+  @Override
+  public SysUserVo selectUserByUsername(String username) {
+    return baseMapper.selectUserByUsername(username);
   }
 
   @Override
@@ -208,7 +199,7 @@ public class SysUserServiceImpl extends BaseServiceImpl<SysUserMapper, SysUser> 
       sysMenus = Lists.newArrayList();
     } else {
       Set<String> menuIds = sysRoleMenuList.stream().map(SysRoleMenu::getPermissionId).collect(Collectors.toSet());
-      sysMenus = sysMenuService.list(Wrappers.lambdaQuery(SysMenu.class)
+      sysMenus = ISysMenuService.list(Wrappers.lambdaQuery(SysMenu.class)
           .in(SysMenu::getLevel, MenuLevelEnum.ONE.getCode(), MenuLevelEnum.TWO.getCode())
           .in(SysMenu::getId, menuIds)
           .orderByAsc(SysMenu::getSort)

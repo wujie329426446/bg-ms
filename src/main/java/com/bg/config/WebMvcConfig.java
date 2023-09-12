@@ -1,20 +1,23 @@
 package com.bg.config;
 
 import com.bg.commons.constant.UploadsPrefix;
+import com.bg.config.properties.ApiPrefixProperties;
 import com.bg.config.properties.BgProperties;
 import com.bg.config.properties.XssProperties;
 import com.bg.framework.filter.JsonRequestBodyFilter;
 import com.bg.framework.filter.TraceIdLogFilter;
+import com.bg.framework.prefix.AdminApiRestController;
 import com.bg.framework.xss.XssFilter;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.util.StringUtils;
+import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
  * WebMvc 配置
@@ -28,9 +31,19 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
   private final XssProperties xssProperties;
 
-  public WebMvcConfig(BgProperties bgProperties, XssProperties xssProperties) {
+  private final ApiPrefixProperties apiPrefixProperties;
+
+  public WebMvcConfig(BgProperties bgProperties, XssProperties xssProperties, ApiPrefixProperties apiPrefixProperties) {
     this.bgProperties = bgProperties;
     this.xssProperties = xssProperties;
+    this.apiPrefixProperties = apiPrefixProperties;
+  }
+
+  @Override
+  public void configurePathMatch(PathMatchConfigurer configurer) {
+    if (!StringUtils.isEmpty(apiPrefixProperties.getAdmin())) {
+      configurer.addPathPrefix(apiPrefixProperties.getAdmin(), c -> c.isAnnotationPresent(AdminApiRestController.class));
+    }
   }
 
   @Override

@@ -3,17 +3,19 @@ package com.bg.system.service.impl;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.bg.commons.enums.StateEnum;
 import com.bg.commons.exception.BusinessException;
-import com.bg.commons.service.impl.BaseServiceImpl;
-import com.bg.system.convert.SysPermissionConvertMapper;
+import com.bg.system.convert.SysMenuConvertMapper;
 import com.bg.system.entity.SysMenu;
+import com.bg.system.entity.SysRoleMenu;
 import com.bg.system.enums.MenuLevelEnum;
 import com.bg.system.mapper.SysMenuMapper;
-import com.bg.system.param.SysPermissionPageParam;
-import com.bg.system.service.SysMenuService;
-import com.bg.system.service.SysRoleMenuService;
+import com.bg.system.param.MenuPageParam;
+import com.bg.system.service.ISysMenuService;
+import com.bg.system.service.ISysRoleMenuService;
 import com.bg.system.vo.SysPermissionTreeVo;
 import com.bg.system.vo.SysPermissionVo;
 import java.io.Serializable;
@@ -23,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,27 +42,23 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Slf4j
 @Service
-public class SysMenuServiceImpl extends BaseServiceImpl<SysMenuMapper, SysMenu> implements SysMenuService {
+@Transactional(rollbackFor = Throwable.class)
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
+public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> implements ISysMenuService {
 
-  @Autowired
-  private SysMenuMapper sysMenuMapper;
-
-  @Autowired
-  private SysRoleMenuService sysRoleMenuService;
-
-  @Autowired
-  private SysPermissionConvertMapper sysPermissionConvertMapper;
+  private final ISysRoleMenuService ISysRoleMenuService;
+  private final SysMenuConvertMapper sysMenuConvertMapper;
 
   @Transactional(rollbackFor = Exception.class)
   @Override
-  public boolean saveSysPermission(SysMenu sysMenu) throws Exception {
+  public boolean saveSysPermission(SysMenu sysMenu) {
     sysMenu.setId(null);
     return super.save(sysMenu);
   }
 
   @Transactional(rollbackFor = Exception.class)
   @Override
-  public boolean updateSysPermission(SysMenu sysMenu) throws Exception {
+  public boolean updateSysPermission(SysMenu sysMenu) {
     // 获取权限
     if (getById(sysMenu.getId()) == null) {
       throw BusinessException.build("权限不存在");
@@ -70,8 +69,8 @@ public class SysMenuServiceImpl extends BaseServiceImpl<SysMenuMapper, SysMenu> 
 
   @Transactional(rollbackFor = Exception.class)
   @Override
-  public boolean deleteSysPermission(String id) throws Exception {
-    boolean isExists = sysRoleMenuService.isExistsByPermissionId(id);
+  public boolean deleteSysPermission(String id) {
+    boolean isExists = ISysRoleMenuService.count(Wrappers.lambdaQuery(SysRoleMenu.class).eq(SysRoleMenu::getPermissionId, id)) > 0;
     if (isExists) {
       throw BusinessException.build("该权限存在角色关联关系，不能删除");
     }
@@ -79,14 +78,14 @@ public class SysMenuServiceImpl extends BaseServiceImpl<SysMenuMapper, SysMenu> 
   }
 
   @Override
-  public SysPermissionVo getSysPermissionById(Serializable id) throws Exception {
-    return sysMenuMapper.getSysPermissionById(id);
+  public SysPermissionVo getSysPermissionById(Serializable id) {
+    return baseMapper.getSysPermissionById(id);
   }
 
   @Override
-  public Page<SysPermissionVo> getSysPermissionPageList(SysPermissionPageParam pageParam) throws Exception {
+  public Page<SysPermissionVo> getSysPermissionPageList(MenuPageParam pageParam) {
     pageParam.pageSortsHandle(OrderItem.desc("create_time"));
-    Page<SysPermissionVo> page = sysMenuMapper.getSysPermissionPageList(pageParam.getPage(), pageParam);
+    Page<SysPermissionVo> page = baseMapper.getSysPermissionPageList(pageParam.getPage(), pageParam);
     return page;
   }
 
@@ -96,19 +95,19 @@ public class SysMenuServiceImpl extends BaseServiceImpl<SysMenuMapper, SysMenu> 
       return false;
     }
     Wrapper wrapper = lambdaQuery().in(SysMenu::getId, permissionIds).getWrapper();
-    return sysMenuMapper.selectCount(wrapper).intValue() == permissionIds.size();
+    return baseMapper.selectCount(wrapper).intValue() == permissionIds.size();
   }
 
   @Override
-  public List<SysMenu> getAllMenuList() throws Exception {
+  public List<SysMenu> getAllMenuList() {
     SysMenu sysMenu = new SysMenu();
     sysMenu.setStatus(StateEnum.ENABLE.getCode());
     // 获取所有已启用的权限列表
-    return sysMenuMapper.selectList(new QueryWrapper(sysMenu));
+    return baseMapper.selectList(new QueryWrapper(sysMenu));
   }
 
   @Override
-  public List<SysPermissionTreeVo> getAllMenuTree() throws Exception {
+  public List<SysPermissionTreeVo> getAllMenuTree() {
     List<SysMenu> list = getAllMenuList();
     // 转换成树形菜单
     List<SysPermissionTreeVo> treeVos = convertSysPermissionTreeVoList(list);
@@ -125,7 +124,7 @@ public class SysMenuServiceImpl extends BaseServiceImpl<SysMenuMapper, SysMenu> 
     List<SysPermissionTreeVo> treeVos = new ArrayList<>();
     // 循环获取三级菜单树形集合
     for (SysMenu one : map.get(MenuLevelEnum.ONE.getCode())) {
-      SysPermissionTreeVo oneVo = sysPermissionConvertMapper.toDto(one);
+      SysPermissionTreeVo oneVo = sysMenuConvertMapper.toDto(one);
       String oneParentId = oneVo.getParentId();
       if (oneParentId == null) {
         treeVos.add(oneVo);
@@ -133,7 +132,7 @@ public class SysMenuServiceImpl extends BaseServiceImpl<SysMenuMapper, SysMenu> 
       List<SysMenu> twoList = map.get(MenuLevelEnum.TWO.getCode());
       if (CollectionUtils.isNotEmpty(twoList)) {
         for (SysMenu two : twoList) {
-          SysPermissionTreeVo twoVo = sysPermissionConvertMapper.toDto(two);
+          SysPermissionTreeVo twoVo = sysMenuConvertMapper.toDto(two);
           if (two.getParentId().equals(one.getId())) {
             if (oneVo.getChildren() == null) {
               oneVo.setChildren(new ArrayList<>());
@@ -144,7 +143,7 @@ public class SysMenuServiceImpl extends BaseServiceImpl<SysMenuMapper, SysMenu> 
           if (CollectionUtils.isNotEmpty(threeList)) {
             for (SysMenu three : threeList) {
               if (three.getParentId().equals(two.getId())) {
-                SysPermissionTreeVo threeVo = sysPermissionConvertMapper.toDto(three);
+                SysPermissionTreeVo threeVo = sysMenuConvertMapper.toDto(three);
                 if (twoVo.getChildren() == null) {
                   twoVo.setChildren(new ArrayList<>());
                 }
@@ -161,16 +160,16 @@ public class SysMenuServiceImpl extends BaseServiceImpl<SysMenuMapper, SysMenu> 
 
   @Override
   public Set<String> getPermissionCodesByUserId(String userId) {
-    return sysMenuMapper.getPermissionCodesByUserId(userId);
+    return baseMapper.getPermissionCodesByUserId(userId);
   }
 
   @Override
-  public List<SysMenu> getMenuListByUserId(String userId) throws Exception {
-    return sysMenuMapper.getMenuListByUserId(userId);
+  public List<SysMenu> getMenuListByUserId(String userId) {
+    return baseMapper.getMenuListByUserId(userId);
   }
 
   @Override
-  public List<SysPermissionTreeVo> getMenuTreeByUserId(String userId) throws Exception {
+  public List<SysPermissionTreeVo> getMenuTreeByUserId(String userId) {
     List<SysMenu> list = getMenuListByUserId(userId);
     // 转换成树形菜单
     List<SysPermissionTreeVo> treeVos = convertSysPermissionTreeVoList(list);
@@ -178,25 +177,39 @@ public class SysMenuServiceImpl extends BaseServiceImpl<SysMenuMapper, SysMenu> 
   }
 
   @Override
-  public List<String> getPermissionIdsByRoleId(String roleId) throws Exception {
+  public List<String> getPermissionIdsByRoleId(String roleId) {
 
     // 根据角色id获取该对应的所有三级权限ID
 
     return null;
   }
 
+  @Override
+  public List<String> getThreeLevelPermissionIdsByRoleId(String roleId) {
+    return baseMapper.getThreeLevelPermissionIdsByRoleId(roleId);
+  }
 
   @Override
-  public List<SysPermissionTreeVo> getNavMenuTree() throws Exception {
+  public List<SysPermissionTreeVo> getNavMenuTree() {
     List<Integer> levels = Arrays.asList(MenuLevelEnum.ONE.getCode(), MenuLevelEnum.TWO.getCode());
     Wrapper wrapper = lambdaQuery()
         .in(SysMenu::getLevel, levels)
         .eq(SysMenu::getStatus, StateEnum.ENABLE.getCode())
         .getWrapper();
 
-    List<SysMenu> list = sysMenuMapper.selectList(wrapper);
+    List<SysMenu> list = baseMapper.selectList(wrapper);
 
     return convertSysPermissionTreeVoList(list);
 
   }
+
+  @Override
+  public List<SysMenu> listRoleMenus(String roleId) {
+    // TODO: 2023/9/1 优化查询，不要遍历查子集
+    List<SysRoleMenu> sysRoleMenuList = ISysRoleMenuService.list(Wrappers.lambdaQuery(SysRoleMenu.class).eq(SysRoleMenu::getRoleId, roleId));
+    return sysRoleMenuList.stream().map(item ->
+        this.getById(item.getPermissionId())
+    ).collect(Collectors.toList());
+  }
+
 }

@@ -13,15 +13,8 @@ import java.util.List;
  *
  * @author jiewus
  */
-public interface SysUserService extends IService<SysUser> {
+public interface ISysUserService extends IService<SysUser> {
 
-  /**
-   * 根据用户名查询单条数据
-   *
-   * @param username 用户名
-   * @return 用户对象
-   */
-  SysUserVo selectUserByUsername(String username);
 
   /**
    * 根据id查询用户对象
@@ -37,7 +30,15 @@ public interface SysUserService extends IService<SysUser> {
    * @param pageParam
    * @return
    */
-  Page<SysUserVo> getPageList(UserPageParam pageParam);
+  Page<SysUserVo> getUserPageList(UserPageParam pageParam);
+
+  /**
+   * 根据用户名查询单条数据
+   *
+   * @param username 用户名
+   * @return 用户对象
+   */
+  SysUserVo selectUserByUsername(String username);
 
   /**
    * 获取菜单列表

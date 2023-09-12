@@ -3,7 +3,7 @@ package com.bg.auth.security.authentication.username;
 import com.bg.auth.service.authentication.AuthenticationService;
 import com.bg.commons.enums.LoginTypeEnum;
 import com.bg.commons.model.UserModel;
-import com.bg.system.service.SysUserService;
+import com.bg.system.service.ISysUserService;
 import com.bg.system.vo.SysUserVo;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
@@ -20,11 +20,11 @@ import java.util.Collections;
 @Component
 public class UsernameAuthenticationProvider implements AuthenticationProvider {
 
-  private final SysUserService userService;
+  private final ISysUserService userService;
 
   private final AuthenticationService authenticationService;
 
-  public UsernameAuthenticationProvider(SysUserService userService, AuthenticationService authenticationService) {
+  public UsernameAuthenticationProvider(ISysUserService userService, AuthenticationService authenticationService) {
     this.userService = userService;
     this.authenticationService = authenticationService;
   }

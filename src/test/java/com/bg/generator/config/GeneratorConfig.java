@@ -5,11 +5,11 @@ import cn.hutool.setting.yaml.YamlUtil;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.IService;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.bg.commons.api.ApiResult;
 import com.bg.commons.exception.BusinessException;
 import com.bg.commons.pagination.BasePageParam;
-import com.bg.commons.service.BaseService;
-import com.bg.commons.service.impl.BaseServiceImpl;
 import com.bg.generator.enums.DefaultOrderType;
 import com.bg.generator.enums.RequestMappingType;
 import java.util.ArrayList;
@@ -408,8 +408,8 @@ public class GeneratorConfig {
     }
     this.projectPackagePath = this.parentPackage.replaceAll("\\.", "/");
     this.commonParentPackage = parentPackage + ".framework";
-    this.superService = BaseService.class.getName();
-    this.superServiceImpl = BaseServiceImpl.class.getName();
+    this.superService = IService.class.getName();
+    this.superServiceImpl = ServiceImpl.class.getName();
     this.superEntityCommonColumns = new String[]{};
 
     this.commonApiResult = ApiResult.class.getName();

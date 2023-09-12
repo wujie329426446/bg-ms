@@ -1,9 +1,9 @@
 package com.bg.system.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.bg.commons.service.BaseService;
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.bg.system.entity.SysDept;
-import com.bg.system.param.SysDepartmentPageParam;
+import com.bg.system.param.DeptPageParam;
 import com.bg.system.vo.SysDeptTreeVo;
 import com.bg.system.vo.SysDeptVo;
 import java.io.Serializable;
@@ -16,7 +16,7 @@ import java.util.List;
  *
  * @author jiewus
  */
-public interface SysDeptService extends BaseService<SysDept> {
+public interface ISysDeptService extends IService<SysDept> {
 
   /**
    * 保存
@@ -61,7 +61,7 @@ public interface SysDeptService extends BaseService<SysDept> {
    * @return
    * @throws Exception
    */
-  Page<SysDeptVo> getSysDepartmentPageList(SysDepartmentPageParam pageParam) throws Exception;
+  Page<SysDeptVo> getSysDepartmentPageList(DeptPageParam pageParam) throws Exception;
 
   /**
    * 获取所有可用的部门列表

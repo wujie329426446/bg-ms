@@ -9,7 +9,7 @@ import lombok.experimental.Accessors;
 
 /**
  * <pre>
- * 部门 查询参数对象
+ * 系统权限 查询参数对象
  * </pre>
  *
  * @author jiewus
@@ -17,9 +17,10 @@ import lombok.experimental.Accessors;
 @Data
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = true)
-@Schema(description = "部门查询参数")
-public class SysDepartmentPageParam extends BasePageParam {
+@Schema(description = "系统权限查询参数")
+public class MenuPageParam extends BasePageParam {
 
   @Serial
   private static final long serialVersionUID = 1L;
+
 }

@@ -1,14 +1,16 @@
 package com.bg.system.service.impl;
 
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.bg.commons.enums.LoginTypeEnum;
 import com.bg.commons.model.UserModel;
-import com.bg.commons.service.impl.BaseServiceImpl;
-import com.bg.commons.utils.SecurityUtil;
 import com.bg.system.entity.SysLogLogin;
 import com.bg.system.mapper.SysLogLoginMapper;
-import com.bg.system.service.SysLogLoginService;
-import java.util.List;
+import com.bg.system.service.ISysLogLoginService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 登陆日志业务逻辑层接口实现
@@ -16,7 +18,10 @@ import org.springframework.stereotype.Service;
  * @author jiewus
  */
 @Service
-public class SysLogLoginServiceImpl extends BaseServiceImpl<SysLogLoginMapper, SysLogLogin> implements SysLogLoginService {
+@Slf4j
+@Transactional(rollbackFor = Throwable.class)
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
+public class SysLogLoginServiceImpl extends ServiceImpl<SysLogLoginMapper, SysLogLogin> implements ISysLogLoginService {
 
   /**
    * 记录登陆信息

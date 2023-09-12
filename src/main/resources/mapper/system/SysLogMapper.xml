@@ -8,7 +8,7 @@
         where id = #{id}
     </select>
 
-    <select id="getSysLogList" parameterType="com.bg.system.param.SysLogQuery"
+    <select id="getSysLogList" parameterType="com.bg.system.param.LogPageParam"
         resultType="com.bg.system.vo.SysLogVo">
         select *
         from sys_log

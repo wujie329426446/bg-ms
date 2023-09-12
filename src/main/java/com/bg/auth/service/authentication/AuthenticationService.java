@@ -4,12 +4,12 @@ import com.bg.auth.exception.LoginException;
 import com.bg.commons.constant.Status;
 import com.bg.commons.enums.LoginTypeEnum;
 import com.bg.commons.model.DeptModel;
+import com.bg.commons.model.RoleModel;
 import com.bg.commons.model.SysUserModel;
 import com.bg.commons.model.UserModel;
 import com.bg.commons.utils.SecurityUtil;
-import com.bg.commons.model.RoleModel;
-import com.bg.system.service.SysMenuService;
-import com.bg.system.service.SysRoleService;
+import com.bg.system.service.ISysMenuService;
+import com.bg.system.service.ISysRoleService;
 import com.bg.system.vo.SysRoleVo;
 import com.bg.system.vo.SysUserVo;
 import java.util.List;
@@ -26,11 +26,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class AuthenticationService implements UserModelProvider {
 
-  private final SysRoleService roleService;
+  private final ISysRoleService roleService;
 
-  private final SysMenuService menuService;
+  private final ISysMenuService menuService;
 
-  public AuthenticationService(SysRoleService roleService, SysMenuService menuService) {
+  public AuthenticationService(ISysRoleService roleService, ISysMenuService menuService) {
     this.roleService = roleService;
     this.menuService = menuService;
   }
@@ -53,9 +53,6 @@ public class AuthenticationService implements UserModelProvider {
     }
     if (user.getStatus().equals(Status.DISABLED)) {
       throw new LoginException("账号已停用");
-    }
-    if (user.getDeleted().equals(Status.DELETED)) {
-      throw new LoginException("账号已删除");
     }
 
     UserModel userModel = new UserModel();
