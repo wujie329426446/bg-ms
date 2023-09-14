@@ -1,5 +1,6 @@
 package com.bg.system.service.impl;
 
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
@@ -8,16 +9,24 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.bg.commons.enums.StateEnum;
 import com.bg.commons.exception.BusinessException;
+import com.bg.commons.model.RoleModel;
+import com.bg.commons.utils.SecurityUtil;
 import com.bg.system.convert.SysMenuConvertMapper;
 import com.bg.system.entity.SysMenu;
 import com.bg.system.entity.SysRoleMenu;
+import com.bg.system.enums.FrameEnum;
+import com.bg.system.enums.KeepaliveEnum;
+import com.bg.system.enums.LinkExternalEnum;
 import com.bg.system.enums.MenuLevelEnum;
 import com.bg.system.mapper.SysMenuMapper;
 import com.bg.system.param.MenuPageParam;
 import com.bg.system.service.ISysMenuService;
 import com.bg.system.service.ISysRoleMenuService;
+import com.bg.system.vo.RouteItemVO;
+import com.bg.system.vo.RouteMetoVO;
 import com.bg.system.vo.SysPermissionTreeVo;
 import com.bg.system.vo.SysPermissionVo;
+import com.google.common.collect.Lists;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -210,6 +219,84 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
     return sysRoleMenuList.stream().map(item ->
         this.getById(item.getPermissionId())
     ).collect(Collectors.toList());
+  }
+
+  @Override
+  public List<RouteItemVO> getMenuList() {
+    List<SysMenu> sysMenus;
+    // 查询菜单
+    List<String> roleIdList = SecurityUtil.getRoles().stream().map(RoleModel::getId).collect(Collectors.toList());
+    List<SysRoleMenu> sysRoleMenuList = new SysRoleMenu().selectList(
+        new QueryWrapper<SysRoleMenu>().lambda().in(SysRoleMenu::getRoleId, roleIdList));
+    if (sysRoleMenuList.isEmpty()) {
+      sysMenus = Lists.newArrayList();
+    } else {
+      Set<String> menuIds = sysRoleMenuList.stream().map(SysRoleMenu::getPermissionId).collect(Collectors.toSet());
+      sysMenus = this.list(Wrappers.lambdaQuery(SysMenu.class)
+          .in(SysMenu::getLevel, MenuLevelEnum.ONE.getCode(), MenuLevelEnum.TWO.getCode())
+          .in(SysMenu::getId, menuIds)
+          .orderByAsc(SysMenu::getSort)
+      );
+    }
+
+    List<RouteItemVO> routeItemVOList = sysMenus.stream().filter(item -> item.getParentId() == null).map(item -> {
+      RouteItemVO node = new RouteItemVO();
+      node.setRoutePath(item.getLevel().equals(MenuLevelEnum.ONE.getCode()) ? "/" + item.getRoutePath() : item.getRoutePath());
+
+      node.setComponent(item.getLevel().equals(MenuLevelEnum.ONE.getCode()) && item.getParentId() == null ? "LAYOUT" : item.getComponent());
+
+      node.setName(StrUtil.upperFirst(item.getRoutePath()));
+      node.setMeta(new RouteMetoVO());
+
+      RouteMetoVO routeMetoVO = new RouteMetoVO();
+      routeMetoVO.setTitle(item.getMenuName());
+      routeMetoVO.setIcon(item.getIcon());
+      if (item.getLevel().equals(MenuLevelEnum.TWO.getCode())) {
+        routeMetoVO.setIgnoreKeepAlive(item.getKeepAlive().equals(KeepaliveEnum.YES.getCode()));
+        if (item.getIsExt().equals(LinkExternalEnum.YES.getCode())) {
+          if (item.getFrame().equals(FrameEnum.YES.getCode())) {
+            routeMetoVO.setFrameSrc(item.getComponent());
+          }
+          if (item.getFrame().equals(FrameEnum.NO.getCode())) {
+            node.setRoutePath(item.getComponent());
+          }
+        }
+      }
+      node.setMeta(routeMetoVO);
+      node.setChildren(getChildrenList(item, sysMenus));
+      return node;
+    }).collect(Collectors.toList());
+    return routeItemVOList;
+  }
+
+  private List<RouteItemVO> getChildrenList(SysMenu root, List<SysMenu> list) {
+    List<RouteItemVO> childrenList = list.stream().filter(item -> item.getParentId() != null && item.getParentId().equals(root.getId())).map(item -> {
+      RouteItemVO node = new RouteItemVO();
+      node.setRoutePath(item.getLevel().equals(MenuLevelEnum.ONE.getCode()) ? "/" + item.getRoutePath() : item.getRoutePath());
+      node.setComponent(item.getLevel().equals(MenuLevelEnum.ONE.getCode()) && item.getParentId() == null ? "LAYOUT" : item.getComponent());
+      node.setName(StrUtil.upperFirst(item.getRoutePath()));
+      node.setMeta(new RouteMetoVO());
+
+      RouteMetoVO routeMetoVO = new RouteMetoVO();
+      routeMetoVO.setTitle(item.getMenuName());
+      routeMetoVO.setIcon(item.getIcon());
+      routeMetoVO.setHideMenu(item.getIsShow() == 0);
+      if (item.getLevel().equals(MenuLevelEnum.TWO.getCode())) {
+        routeMetoVO.setIgnoreKeepAlive(!item.getKeepAlive().equals(KeepaliveEnum.YES.getCode()));
+        if (item.getIsExt().equals(LinkExternalEnum.YES.getCode())) {
+          if (item.getFrame().equals(FrameEnum.YES.getCode())) {
+            routeMetoVO.setFrameSrc(item.getComponent());
+          }
+          if (item.getFrame().equals(FrameEnum.NO.getCode())) {
+            node.setRoutePath(item.getComponent());
+          }
+        }
+      }
+      node.setMeta(routeMetoVO);
+      node.setChildren(getChildrenList(item, list));
+      return node;
+    }).collect(Collectors.toList());
+    return childrenList;
   }
 
 }

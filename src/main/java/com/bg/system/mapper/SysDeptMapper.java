@@ -1,10 +1,8 @@
 package com.bg.system.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.bg.system.entity.SysDept;
-import com.bg.system.param.DeptPageParam;
-import com.bg.system.vo.SysDeptVo;
+import java.util.List;
 import org.apache.ibatis.annotations.Param;
 
 /**
@@ -16,14 +14,12 @@ import org.apache.ibatis.annotations.Param;
  */
 public interface SysDeptMapper extends BaseMapper<SysDept> {
 
-
   /**
-   * 获取分页对象
+   * 获取部门及部门下有关联用户的部门
    *
-   * @param page
-   * @param sysDepartmentPageParam
+   * @param levelCode
    * @return
    */
-  Page<SysDeptVo> getSysDeptPageList(@Param("page") Page page, @Param("param") DeptPageParam pageParam);
+  List<String> getExitsUserDeptName(@Param("levelCode") String levelCode);
 
 }

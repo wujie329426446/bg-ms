@@ -13,9 +13,7 @@ import com.bg.framework.prefix.AdminApiRestController;
 import com.bg.system.entity.SysUser;
 import com.bg.system.param.UserPageParam;
 import com.bg.system.service.ISysUserService;
-import com.bg.system.vo.RouteItemVO;
 import com.bg.system.vo.SysUserVo;
-import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -24,7 +22,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,9 +89,9 @@ public class SysUserController extends BaseController<SysUser, ISysUserService, 
 
   @GetMapping("/detail")
   @PreAuthorize("@auth.hasPermission('sys:user:info')")
-  @OperationLog(name = "系统用户详情查看", type = OperationLogType.INFO)
+  @OperationLog(name = "系统用户详情", type = OperationLogType.INFO)
   @Operation(
-      summary = "系统用户详情查看",
+      summary = "系统用户详情",
       parameters = {
           @Parameter(
               description = "主键id",
@@ -180,28 +177,5 @@ public class SysUserController extends BaseController<SysUser, ISysUserService, 
     return ApiResult.success(page);
   }
 
-  @Hidden
-  @GetMapping("/getMenuList")
-  @Operation(
-      summary = "获取菜单集合",
-      responses = {
-          @ApiResponse(
-              responseCode = "200",
-              description = "Success",
-              content = @Content(
-                  mediaType = MediaType.APPLICATION_JSON_VALUE,
-                  schema = @Schema(
-                      title = "ApiResult和RouteItemVO组合模型",
-                      description = "返回实体，ApiResult内data为RouteItemVO集合",
-                      implementation = RouteItemVO.class
-                  )
-              )
-          )
-      },
-      security = {@SecurityRequirement(name = LoginConstant.BG_HEADER)}
-  )
-  public ApiResult<List<RouteItemVO>> getMenuList() throws Exception {
-    return ApiResult.success(baseService.getMenuList());
-  }
 
 }

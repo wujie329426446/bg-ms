@@ -48,6 +48,12 @@ public class SysRoleVo implements Serializable {
   @Schema(description = "创建时间")
   private LocalDateTime createTime;
 
+  @Schema(description = "创建人姓名")
+  private String creatorName;
+
+  @Schema(description = "修改人姓名")
+  private String updateName;
+
   @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
   @Schema(description = "修改时间")
   private LocalDateTime updateTime;

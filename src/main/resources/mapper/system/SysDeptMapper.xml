@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bg.system.mapper.SysDeptMapper">
+
+    <select id="getExitsUserDeptName" resultType="java.lang.String">
+        select distinct sd.dept_name
+        from sys_user su
+                 inner join sys_dept sd on sd.id = su.dept_id and sd.deleted = 0
+        where su.deleted = 0
+          and sd.level_code like concat(#{levelCode}, '%')
+    </select>
+
+</mapper>

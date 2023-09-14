@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.bg.system.entity.SysMenu;
 import com.bg.system.param.MenuPageParam;
+import com.bg.system.vo.RouteItemVO;
 import com.bg.system.vo.SysPermissionTreeVo;
 import com.bg.system.vo.SysPermissionVo;
 import java.io.Serializable;
@@ -159,5 +160,12 @@ public interface ISysMenuService extends IService<SysMenu> {
    * @return
    */
   List<SysMenu> listRoleMenus(String roleId);
+
+  /**
+   * 获取菜单列表
+   *
+   * @return
+   */
+  List<RouteItemVO> getMenuList();
 
 }

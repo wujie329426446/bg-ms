@@ -109,7 +109,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
 
   @Override
   public SysRoleVo getRoleById(String id) {
-    SysRole sysRole = this.getById(id);
+    SysRole sysRole = super.getById(id);
     SysRoleVo sysRoleVo = sysRoleConvertMapper.toDto(sysRole);
     // 获取关联菜单集合
     List<String> permissionIds = ISysRoleMenuService.listObjs(Wrappers.lambdaQuery(SysRoleMenu.class)
@@ -137,7 +137,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
 
   @Override
   public Page<SysRole> getRolePageList(RolePageParam pageParam) {
-    LambdaQueryWrapper<SysRole> queryWrapper = new LambdaQueryWrapper<>();
+    LambdaQueryWrapper<SysRole> queryWrapper = Wrappers.lambdaQuery(SysRole.class);
     String keyword = pageParam.getKeyword();
     String name = pageParam.getRoleName();
     String code = pageParam.getRoleCode();
@@ -149,18 +149,18 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
             i -> i.like(SysRole::getRoleName, keyword)
                 .or().like(SysRole::getRoleCode, keyword)
         )
-        .like(StringUtils.isNotBlank(name), SysRole::getRoleName, pageParam.getRoleName())
+        .like(StringUtils.isNotBlank(name), SysRole::getRoleName, name)
         .like(StringUtils.isNotBlank(code), SysRole::getRoleCode, code)
         .like(Objects.nonNull(state), SysRole::getStatus, state)
         .orderByDesc(SysRole::getCreateTime);
 
-    Page<SysRole> page = this.page(pageParam.getPage(), queryWrapper);
+    Page<SysRole> page = super.page(pageParam.getPage(), queryWrapper);
     return page;
   }
 
   @Override
   public List<SysRoleVo> getRoleList(RolePageParam pageParam) {
-    LambdaQueryWrapper<SysRole> queryWrapper = new LambdaQueryWrapper<>();
+    LambdaQueryWrapper<SysRole> queryWrapper = Wrappers.lambdaQuery(SysRole.class);
     String keyword = pageParam.getKeyword();
     String name = pageParam.getRoleName();
     String code = pageParam.getRoleCode();
@@ -172,12 +172,12 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
             i -> i.like(SysRole::getRoleName, keyword)
                 .or().like(SysRole::getRoleCode, keyword)
         )
-        .like(StringUtils.isNotBlank(name), SysRole::getRoleName, pageParam.getRoleName())
+        .like(StringUtils.isNotBlank(name), SysRole::getRoleName, name)
         .like(StringUtils.isNotBlank(code), SysRole::getRoleCode, code)
         .like(Objects.nonNull(state), SysRole::getStatus, state)
         .orderByDesc(SysRole::getCreateTime);
 
-    List<SysRole> list = this.list(queryWrapper);
+    List<SysRole> list = super.list(queryWrapper);
     return sysRoleConvertMapper.toDto(list);
   }
 

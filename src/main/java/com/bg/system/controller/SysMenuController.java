@@ -2,19 +2,27 @@ package com.bg.system.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.bg.commons.api.ApiResult;
+import com.bg.commons.constant.LoginConstant;
 import com.bg.commons.controller.BaseController;
 import com.bg.commons.log.annotation.OperationLog;
 import com.bg.commons.log.enums.OperationLogType;
 import com.bg.system.entity.SysMenu;
 import com.bg.system.param.MenuPageParam;
 import com.bg.system.service.ISysMenuService;
+import com.bg.system.vo.RouteItemVO;
 import com.bg.system.vo.SysPermissionTreeVo;
 import com.bg.system.vo.SysPermissionVo;
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -144,6 +152,30 @@ public class SysMenuController extends BaseController<SysMenu, ISysMenuService, 
   @Operation(summary = "查询角色关联的菜单")
   public ApiResult<List<SysMenu>> listRoleMenus(@RequestParam String roleId) {
     return ApiResult.success(baseService.listRoleMenus(roleId));
+  }
+
+  @Hidden
+  @GetMapping("/getMenuList")
+  @Operation(
+      summary = "获取当前用户菜单集合",
+      responses = {
+          @ApiResponse(
+              responseCode = "200",
+              description = "Success",
+              content = @Content(
+                  mediaType = MediaType.APPLICATION_JSON_VALUE,
+                  schema = @Schema(
+                      title = "ApiResult和RouteItemVO组合模型",
+                      description = "返回实体，ApiResult内data为RouteItemVO集合",
+                      implementation = RouteItemVO.class
+                  )
+              )
+          )
+      },
+      security = {@SecurityRequirement(name = LoginConstant.BG_HEADER)}
+  )
+  public ApiResult<List<RouteItemVO>> getMenuList() throws Exception {
+    return ApiResult.success(baseService.getMenuList());
   }
 
 }

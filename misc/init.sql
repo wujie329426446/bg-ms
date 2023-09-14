@@ -257,7 +257,7 @@ VALUES ('d73b03fb4b9211eea1093a31d6d59109', '部门分页列表', 'b2fae1bd4b911
 INSERT INTO `sys_menu` (`id`, `menu_name`, `parent_id`, `route_path`, `code`, `icon`, `type`, `level`, `status`, `sort`, `remark`, `version`, `component`, `is_show`, `keep_alive`, `is_ext`, `frame`)
 VALUES ('ddc5b7984b9211eea1093a31d6d59109', '部门列表', 'b2fae1bd4b9111eea1093a31d6d59109', NULL, 'sys:department:list', NULL, 3, 3, 1, 6, NULL, 0, NULL, 1, 1, 0, NULL);
 INSERT INTO `sys_menu` (`id`, `menu_name`, `parent_id`, `route_path`, `code`, `icon`, `type`, `level`, `status`, `sort`, `remark`, `version`, `component`, `is_show`, `keep_alive`, `is_ext`, `frame`)
-VALUES ('e794f0ec4b9211eea1093a31d6d59109', '部门树形列表', 'b2fae1bd4b9111eea1093a31d6d59109', NULL, 'sys:department:all:tree', NULL, 3, 3, 1, 7, NULL, 0, NULL, 1, 1, 0, NULL);
+VALUES ('e794f0ec4b9211eea1093a31d6d59109', '部门树形列表', 'b2fae1bd4b9111eea1093a31d6d59109', NULL, 'sys:department:tree', NULL, 3, 3, 1, 7, NULL, 0, NULL, 1, 1, 0, NULL);
 -- 日志管理
 INSERT INTO `sys_menu` (`id`, `menu_name`, `parent_id`, `route_path`, `code`, `icon`, `type`, `level`, `status`, `sort`, `remark`, `version`, `component`, `is_show`, `keep_alive`, `is_ext`, `frame`)
 VALUES ('c51f57d94b9111eea1093a31d6d59109', '日志管理', 'd48019c64b9011eea1093a31d6d59109', 'log', 'sys:log:manager', NULL, 2, 2, 1, 5, NULL, 0, NULL, 0, 1, 0, NULL);

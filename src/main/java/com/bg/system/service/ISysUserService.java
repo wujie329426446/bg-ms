@@ -4,9 +4,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.bg.system.entity.SysUser;
 import com.bg.system.param.UserPageParam;
-import com.bg.system.vo.RouteItemVO;
 import com.bg.system.vo.SysUserVo;
-import java.util.List;
 
 /**
  * User Service 接口
@@ -40,11 +38,5 @@ public interface ISysUserService extends IService<SysUser> {
    */
   SysUserVo selectUserByUsername(String username);
 
-  /**
-   * 获取菜单列表
-   *
-   * @return
-   */
-  List<RouteItemVO> getMenuList();
 
 }

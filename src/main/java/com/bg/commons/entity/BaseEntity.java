@@ -27,7 +27,6 @@ import lombok.experimental.Accessors;
  * @author jiewus
  */
 @Data
-@Accessors(chain = true)
 @EqualsAndHashCode(callSuper = true)
 @Schema(description = "BaseEntity对象，通用字段")
 public abstract class BaseEntity<T extends Model<?>> extends Model<T> implements Serializable {

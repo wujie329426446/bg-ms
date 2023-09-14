@@ -12,8 +12,6 @@
 
 > 管理员：bg 123456
 
-> 数据库每日零点重制
-
 ## 二、项目结构
 
 ```
@@ -23,7 +21,6 @@ bg
 └── bg-ms              --  后端服务，Spring Boot全家桶
     ├── bg-bootstrap     --  启动模块
     ├── bg-framework     --  框架核心模块
-    ├── bg-nav           --  导航模块
     └── bg-system        --  系统模块
 ```
 
