@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.bg.commons.enums.SysLogEnum;
+import com.bg.commons.enums.LogTypeEnum;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -15,6 +15,7 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import lombok.Data;
+import lombok.ToString;
 import lombok.experimental.Accessors;
 
 /**
@@ -24,6 +25,7 @@ import lombok.experimental.Accessors;
  */
 @Data
 @Accessors(chain = true)
+@ToString(callSuper = true)
 @TableName("sys_log")
 @Schema(description = "系统日志")
 public class SysLog implements Serializable {
@@ -41,7 +43,25 @@ public class SysLog implements Serializable {
 
   @Schema(description = "请求时间")
   @TableField("request_time")
-  private String requestTime;
+  @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+  @JsonSerialize(using = LocalDateTimeSerializer.class)
+  @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+  private LocalDateTime requestTime;
+
+  @Schema(description = "响应时间")
+  @TableField("response_time")
+  @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+  @JsonSerialize(using = LocalDateTimeSerializer.class)
+  @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+  private LocalDateTime responseTime;
+
+  @Schema(description = "耗时，单位：毫秒")
+  @TableField("diff_time")
+  private Long diffTime;
+
+  @Schema(description = "耗时描述")
+  @TableField("diff_time_desc")
+  private String diffTimeDesc;
 
   @Schema(description = "全路径")
   @TableField("request_url")
@@ -121,11 +141,8 @@ public class SysLog implements Serializable {
 
   @Schema(description = "0:访问日志,1:新增,2:修改,3:删除,4:详情,5:所有列表,6:分页列表,7:其它查询,8:上传文件,9:登录,10:退出")
   @TableField("log_type")
-  private SysLogEnum logType;
+  private LogTypeEnum logType;
 
-  @Schema(description = "响应时间")
-  @TableField("response_time")
-  private String responseTime;
 
   @Schema(description = "0:失败,1:成功")
   @TableField("response_success")
@@ -150,14 +167,6 @@ public class SysLog implements Serializable {
   @Schema(description = "异常信息")
   @TableField("exception_message")
   private String exceptionMessage;
-
-  @Schema(description = "耗时，单位：毫秒")
-  @TableField("diff_time")
-  private Long diffTime;
-
-  @Schema(description = "耗时描述")
-  @TableField("diff_time_desc")
-  private String diffTimeDesc;
 
   @Schema(description = "请求来源地址")
   @TableField("referer")
@@ -187,23 +196,6 @@ public class SysLog implements Serializable {
   @TableField("user_agent")
   private String userAgent;
 
-  @Schema(description = "备注")
-  @TableField("remark")
-  private String remark;
-
-  @Schema(description = "创建时间")
-  @TableField("create_time")
-  @JsonDeserialize(using = LocalDateTimeDeserializer.class)
-  @JsonSerialize(using = LocalDateTimeSerializer.class)
-  @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-  private LocalDateTime createTime;
-
-  @Schema(description = "修改时间")
-  @TableField("update_time")
-  @JsonDeserialize(using = LocalDateTimeDeserializer.class)
-  @JsonSerialize(using = LocalDateTimeSerializer.class)
-  @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-  private LocalDateTime updateTime;
 
 }
 

@@ -1,12 +1,12 @@
 package com.bg.commons.model;
 
 import com.bg.commons.enums.GenderEnum;
+import com.bg.commons.enums.StatusEnum;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
-
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serial;
 import java.io.Serializable;
@@ -53,7 +53,7 @@ public class SysUserModel implements Serializable {
   private String password;
 
   @Schema(description = "帐号状态")
-  private Integer status;
+  private StatusEnum status;
 
   @Schema(description = "删除标志")
   private String deleted;

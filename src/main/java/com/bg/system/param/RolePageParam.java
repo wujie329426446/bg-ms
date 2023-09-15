@@ -1,5 +1,6 @@
 package com.bg.system.param;
 
+import com.bg.commons.enums.StatusEnum;
 import com.bg.commons.pagination.BasePageParam;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serial;
@@ -31,6 +32,6 @@ public class RolePageParam extends BasePageParam {
   private String roleCode;
 
   @Schema(description = "角色状态，0：禁用，1：启用")
-  private Integer state;
+  private StatusEnum status;
 
 }

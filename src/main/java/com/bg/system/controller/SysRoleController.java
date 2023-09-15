@@ -61,7 +61,7 @@ public class SysRoleController extends BaseController<SysRole, ISysRoleService, 
       ),
       security = {@SecurityRequirement(name = LoginConstant.BG_HEADER)}
   )
-  public ApiResult<Boolean> addSysRole(@Validated(Add.class) @RequestBody SysRole sysRole) {
+  public ApiResult<Boolean> save(@Validated(Add.class) @RequestBody SysRole sysRole) {
     Boolean flag = baseService.save(sysRole);
     return ApiResult.result(flag);
   }
@@ -137,7 +137,7 @@ public class SysRoleController extends BaseController<SysRole, ISysRoleService, 
       },
       security = {@SecurityRequirement(name = LoginConstant.BG_HEADER)}
   )
-  public ApiResult<Boolean> deleteSysRole(@PathVariable("id") String id) throws Exception {
+  public ApiResult<Boolean> deleteSysRole(@PathVariable("id") String id) {
     boolean flag = baseService.removeById(id);
     return ApiResult.result(flag);
   }
@@ -178,7 +178,7 @@ public class SysRoleController extends BaseController<SysRole, ISysRoleService, 
     return ApiResult.success(page);
   }
 
-  @GetMapping("/getList")
+  @PostMapping("/getList")
   @PreAuthorize("@auth.hasPermission('sys:role:list')")
   @OperationLog(name = "系统角色列表", type = OperationLogType.LIST)
   @Operation(
@@ -200,7 +200,7 @@ public class SysRoleController extends BaseController<SysRole, ISysRoleService, 
               content = @Content(
                   mediaType = MediaType.APPLICATION_JSON_VALUE,
                   schema = @Schema(
-                      title = "ApiResult、SysRole",
+                      title = "ApiResult、SysRoleVo",
                       description = "返回实体，ApiResult内data为SysRoleVo集合",
                       anyOf = {ApiResult.class, SysRoleVo.class}
                   )

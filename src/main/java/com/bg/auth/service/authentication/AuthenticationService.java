@@ -1,8 +1,8 @@
 package com.bg.auth.service.authentication;
 
 import com.bg.auth.exception.LoginException;
-import com.bg.commons.constant.Status;
 import com.bg.commons.enums.LoginTypeEnum;
+import com.bg.commons.enums.StatusEnum;
 import com.bg.commons.model.DeptModel;
 import com.bg.commons.model.RoleModel;
 import com.bg.commons.model.SysUserModel;
@@ -51,7 +51,7 @@ public class AuthenticationService implements UserModelProvider {
     if (!SecurityUtil.matchesPassword(password, user.getPassword())) {
       throw new LoginException("密码错误");
     }
-    if (user.getStatus().equals(Status.DISABLED)) {
+    if (user.getStatus().equals(StatusEnum.DISABLE)) {
       throw new LoginException("账号已停用");
     }
 
@@ -80,7 +80,7 @@ public class AuthenticationService implements UserModelProvider {
     ).toList();
 
     // 权限集合
-    Set<String> permissions = menuService.getPermissionCodesByUserId(user.getId());
+    Set<String> permissions = menuService.getCodesByUser(user.getId());
 
     // 将信息放进登陆用户模型
     userModel.setLoginType(loginType);

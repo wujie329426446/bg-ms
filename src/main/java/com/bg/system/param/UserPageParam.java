@@ -1,5 +1,6 @@
 package com.bg.system.param;
 
+import com.bg.commons.enums.StatusEnum;
 import com.bg.commons.pagination.BasePageParam;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serial;
@@ -29,7 +30,7 @@ public class UserPageParam extends BasePageParam {
   private String roleId;
 
   @Schema(description = "状态，0：禁用，1：启用，2：锁定")
-  private Integer status;
+  private StatusEnum status;
 
   @Schema(description = "创建时间开始")
   private Date createTimeStart;

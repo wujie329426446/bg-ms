@@ -6,7 +6,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.bg.commons.api.ApiCode;
-import com.bg.commons.enums.StateEnum;
+import com.bg.commons.enums.StatusEnum;
 import com.bg.commons.exception.BusinessException;
 import com.bg.system.convert.SysRoleConvertMapper;
 import com.bg.system.entity.SysRole;
@@ -115,7 +115,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
     List<String> permissionIds = ISysRoleMenuService.listObjs(Wrappers.lambdaQuery(SysRoleMenu.class)
         .select(SysRoleMenu::getPermissionId)
         .eq(SysRoleMenu::getRoleId, id)
-        .eq(SysRoleMenu::getStatus, StateEnum.ENABLE.getCode()), Object::toString);
+        .eq(SysRoleMenu::getStatus, StatusEnum.ENABLE.getCode()), Object::toString);
     sysRoleVo.setPermissions(permissionIds);
     return sysRoleVo;
   }
@@ -141,7 +141,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
     String keyword = pageParam.getKeyword();
     String name = pageParam.getRoleName();
     String code = pageParam.getRoleCode();
-    Integer state = pageParam.getState();
+    StatusEnum status = pageParam.getStatus();
 
     // 条件查询
     queryWrapper
@@ -151,9 +151,10 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
         )
         .like(StringUtils.isNotBlank(name), SysRole::getRoleName, name)
         .like(StringUtils.isNotBlank(code), SysRole::getRoleCode, code)
-        .like(Objects.nonNull(state), SysRole::getStatus, state)
         .orderByDesc(SysRole::getCreateTime);
-
+    if (Objects.nonNull(status)) {
+      queryWrapper.eq(SysRole::getStatus, status.getCode());
+    }
     Page<SysRole> page = super.page(pageParam.getPage(), queryWrapper);
     return page;
   }
@@ -164,7 +165,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
     String keyword = pageParam.getKeyword();
     String name = pageParam.getRoleName();
     String code = pageParam.getRoleCode();
-    Integer state = pageParam.getState();
+    StatusEnum status = pageParam.getStatus();
 
     // 条件查询
     queryWrapper
@@ -174,9 +175,10 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
         )
         .like(StringUtils.isNotBlank(name), SysRole::getRoleName, name)
         .like(StringUtils.isNotBlank(code), SysRole::getRoleCode, code)
-        .like(Objects.nonNull(state), SysRole::getStatus, state)
         .orderByDesc(SysRole::getCreateTime);
-
+    if (Objects.nonNull(status)) {
+      queryWrapper.eq(SysRole::getStatus, status.getCode());
+    }
     List<SysRole> list = super.list(queryWrapper);
     return sysRoleConvertMapper.toDto(list);
   }

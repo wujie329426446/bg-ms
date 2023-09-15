@@ -45,7 +45,7 @@ public class SysUser extends BaseEntity<SysUser> {
 
   @Schema(description = "真名")
   @TableField("realname")
-  private String realName;
+  private String realname;
 
   @Schema(description = "用户显示名称")
   @TableField("nickname")

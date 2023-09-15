@@ -2,7 +2,7 @@ package com.bg.system.convert;
 
 import com.bg.commons.convert.BaseConvertMapper;
 import com.bg.system.entity.SysMenu;
-import com.bg.system.vo.SysMenuVo;
+import com.bg.system.vo.SysMenuTreeVo;
 import org.mapstruct.Mapper;
 
 /**
@@ -12,6 +12,6 @@ import org.mapstruct.Mapper;
  * @author jiewus
  **/
 @Mapper(componentModel = "spring")
-public interface SysMenuConvertMapper extends BaseConvertMapper<SysMenuVo, SysMenu> {
+public interface SysMenuTreeConvertMapper extends BaseConvertMapper<SysMenuTreeVo, SysMenu> {
 
 }

@@ -1,5 +1,6 @@
 package com.bg.system.vo;
 
+import com.bg.commons.enums.StatusEnum;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serial;
@@ -38,7 +39,7 @@ public class SysDeptVo implements Serializable {
   private String parentId;
 
   @Schema(description = "状态，0：禁用，1：启用")
-  private Integer status;
+  private StatusEnum status;
 
   @Schema(description = "排序")
   private Integer sort;

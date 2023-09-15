@@ -1,7 +1,5 @@
 package com.bg.framework.aop;
 
-import cn.hutool.core.date.DatePattern;
-import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.http.useragent.Browser;
 import cn.hutool.http.useragent.Platform;
@@ -10,22 +8,30 @@ import cn.hutool.http.useragent.UserAgentUtil;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.bg.auth.annotation.Permission;
+import com.bg.commons.api.ApiResult;
+import com.bg.commons.constant.AspectConstant;
+import com.bg.commons.constant.CommonConstant;
 import com.bg.commons.utils.HttpRequestUtil;
 import com.bg.commons.utils.IpRegionUtil;
 import com.bg.commons.utils.IpUtil;
 import com.bg.commons.utils.SecurityUtil;
 import com.bg.commons.utils.TokenUtil;
+import com.bg.commons.vo.IpRegion;
+import com.bg.config.properties.LogAopProperties;
 import com.bg.framework.annotation.Log;
 import com.bg.framework.exception.GlobalExceptionHandler;
-import com.bg.commons.api.ApiResult;
-import com.bg.commons.constant.AspectConstant;
-import com.bg.commons.constant.CommonConstant;
-import com.bg.config.properties.LogAopProperties;
-import com.bg.commons.vo.IpRegion;
 import com.bg.system.entity.SysLog;
 import com.bg.system.mapper.SysLogMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.math.BigDecimal;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Map;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -47,14 +53,6 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.bind.annotation.RequestBody;
-
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-import java.math.BigDecimal;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Map;
 
 /**
  * 日志AOP
@@ -171,8 +169,7 @@ public class SysLogAop {
       // 设置请求路径
       sysLog.setRequestUrl(requestUrl);
       // 设置请求时间，包含毫秒
-      String requestTime = DateUtil.format(new Date(), DatePattern.NORM_DATETIME_FORMATTER);
-      sysLog.setRequestTime(requestTime);
+      sysLog.setRequestTime(LocalDateTime.now());
       // 设置日志链路ID
       String traceId = MDC.get(CommonConstant.TRACE_ID);
       sysLog.setTraceId(traceId);
@@ -290,11 +287,10 @@ public class SysLogAop {
     try {
       SysLog sysLog = LOCAL_LOG.get();
       LOCAL_LOG.remove();
-      String requestTime = sysLog.getRequestTime();
-      Date requestDate = DateUtil.parse(requestTime, DatePattern.NORM_DATETIME_FORMATTER);
-      long startTime = requestDate.getTime();
-      Date responseDate = new Date();
-      long nowTime = responseDate.getTime();
+      LocalDateTime requestTime = sysLog.getRequestTime();
+      long startTime = Timestamp.valueOf(requestTime).getTime();
+      LocalDateTime responseDate = LocalDateTime.now();
+      long nowTime = Timestamp.valueOf(responseDate).getTime();
       long diffTime = nowTime - startTime;
       String diffTimeDesc;
       if (diffTime > CommonConstant.ONE_THOUSAND) {
@@ -304,8 +300,7 @@ public class SysLogAop {
         diffTimeDesc = diffTime + "ms";
       }
       sysLog.setDiffTimeDesc(diffTimeDesc);
-      String responseTime = DateUtil.format(responseDate, DatePattern.NORM_DATETIME_FORMATTER);
-      sysLog.setResponseTime(responseTime);
+      sysLog.setResponseTime(responseDate);
       sysLog.setDiffTime(diffTime);
       // 保存日志
       saveSysLog(sysLog);

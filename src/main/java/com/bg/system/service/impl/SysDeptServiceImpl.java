@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.bg.commons.api.ApiCode;
 import com.bg.commons.api.ApiResult;
+import com.bg.commons.enums.StatusEnum;
 import com.bg.commons.exception.BusinessException;
 import com.bg.system.convert.SysDeptConvertMapper;
 import com.bg.system.convert.SysDeptTreeConvertMapper;
@@ -165,7 +166,7 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept> impl
     String keyword = pageParam.getKeyword();
     String deptName = pageParam.getDeptName();
     String parentId = pageParam.getParentId();
-    Integer status = pageParam.getStatus();
+    StatusEnum status = pageParam.getStatus();
 
     // 条件查询
     queryWrapper
@@ -174,8 +175,10 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept> impl
         )
         .like(StringUtils.isNotBlank(deptName), SysDept::getDeptName, deptName)
         .like(StringUtils.isNotBlank(parentId), SysDept::getParentId, parentId)
-        .like(Objects.nonNull(status), SysDept::getStatus, status)
-    ;
+        .orderByDesc(SysDept::getCreateTime);
+    if (Objects.nonNull(status)) {
+      queryWrapper.eq(SysDept::getStatus, status.getCode());
+    }
 
     Page<SysDept> page = super.page(pageParam.getPage(), queryWrapper);
     return page;
@@ -187,7 +190,7 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept> impl
     String keyword = pageParam.getKeyword();
     String deptName = pageParam.getDeptName();
     String parentId = pageParam.getParentId();
-    Integer status = pageParam.getStatus();
+    StatusEnum status = pageParam.getStatus();
 
     // 条件查询
     queryWrapper
@@ -196,8 +199,10 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept> impl
         )
         .like(StringUtils.isNotBlank(deptName), SysDept::getDeptName, deptName)
         .like(StringUtils.isNotBlank(parentId), SysDept::getParentId, parentId)
-        .like(Objects.nonNull(status), SysDept::getStatus, status)
-    ;
+        .orderByDesc(SysDept::getCreateTime);
+    if (Objects.nonNull(status)) {
+      queryWrapper.eq(SysDept::getStatus, status.getCode());
+    }
     List<SysDept> list = super.list(queryWrapper);
     return sysDeptConvertMapper.toDto(list);
   }

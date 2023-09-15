@@ -106,6 +106,7 @@
         <if test="param.nickname != null and param.nickname != ''">
             and u.nickname like concat('%', #{param.nickname} ,'%')
         </if>
+        order by u.create_time desc
     </select>
 
 </mapper>

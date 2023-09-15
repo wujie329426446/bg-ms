@@ -1,10 +1,15 @@
 package com.bg.system.vo;
 
+import com.bg.commons.enums.StatusEnum;
+import com.bg.system.enums.MenuLevelEnum;
+import com.bg.system.enums.MenuTypeEnum;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import lombok.Data;
+import lombok.ToString;
 import lombok.experimental.Accessors;
 
 /**
@@ -16,9 +21,11 @@ import lombok.experimental.Accessors;
  */
 @Data
 @Accessors(chain = true)
+@ToString(callSuper = true)
 @Schema(description = "系统权限查询参数")
-public class SysPermissionVo implements Serializable {
+public class SysMenuVo implements Serializable {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   @Schema(description = "主键")
@@ -39,14 +46,14 @@ public class SysPermissionVo implements Serializable {
   @Schema(description = "图标")
   private String icon;
 
-  @Schema(description = "类型，1：菜单，2：按钮")
-  private Integer type;
+  @Schema(description = "类型，1：目录，2：菜单，3：按钮")
+  private MenuTypeEnum type;
 
   @Schema(description = "层级，1：第一级，2：第二级，N：第N级")
-  private Integer level;
+  private MenuLevelEnum level;
 
   @Schema(description = "状态，0：禁用，1：启用")
-  private Integer state;
+  private StatusEnum status;
 
   @Schema(description = "排序")
   private Integer sort;
@@ -54,8 +61,17 @@ public class SysPermissionVo implements Serializable {
   @Schema(description = "备注")
   private String remark;
 
-  @Schema(description = "版本")
-  private Integer version;
+  @Schema(description = "组件")
+  private String component;
+
+  @Schema(description = "isShow")
+  private Integer isShow;
+
+  @Schema(description = "keepAlive")
+  private Integer keepAlive;
+
+  @Schema(description = "isExt")
+  private Integer isExt;
 
   @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
   @Schema(description = "创建时间")

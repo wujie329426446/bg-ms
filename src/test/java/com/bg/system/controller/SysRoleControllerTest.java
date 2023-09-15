@@ -1,11 +1,12 @@
 package com.bg.system.controller;
 
 import com.alibaba.fastjson2.JSONObject;
-import com.bg.system.entity.SysDept;
-import com.bg.system.param.DeptPageParam;
-import com.bg.system.service.ISysDeptService;
+import com.bg.system.entity.SysRole;
+import com.bg.system.param.RolePageParam;
+import com.bg.system.service.ISysRoleService;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -25,20 +26,20 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
  * @ProjectName: bg-ms
  * @Author: jiewus
  * @Description:
- * @Date: 2023/9/13 15:44
+ * @Date: 2023/9/14 12:20
  */
 @SpringBootTest
 @Slf4j
-public class SysDeptControllerTest extends Assertions {
+public class SysRoleControllerTest {
 
   private MockMvc mvc;
   @InjectMocks
-  private SysDeptController baseController;
+  private SysRoleController baseController;
   @Autowired
-  private ISysDeptService baseService;
+  private ISysRoleService baseService;
 
   @BeforeEach
-  public void setup() {
+  public void setUp() {
     //通过ReflectionTestUtils注入service
     ReflectionTestUtils.setField(baseController, "baseService", baseService);
 
@@ -52,15 +53,19 @@ public class SysDeptControllerTest extends Assertions {
 
   @Test
   public void save() throws Exception {
-    SysDept sysDept = new SysDept();
-    sysDept.setDeptName("testName041").setDeptCode("testCode041");
-    sysDept.setRemark("test041");
-    sysDept.setParentId("1f5d3d9bdfa4f3cf0aeac05f24417149");
+    SysRole sysRole = new SysRole();
+    sysRole.setRoleName("testName001").setRoleCode("testCode001");
+    List<String> permissions = new ArrayList<>();
+    permissions.add("80a091a0b9fe529cc1e8c41afb6f04f6");
+    permissions.add("11814120ca56ccb80f637d2d410386de");
+    permissions.add("8f428b20eeef046f45d19b13fdc81111");
+    permissions.add("491545f117b9fdf8078acfe72ef5aecd");
+    sysRole.setPermissions(permissions);
 
     RequestBuilder requestBuilder = MockMvcRequestBuilders
-        .post("/dept/add")
+        .post("/role/add")
         .contentType(MediaType.APPLICATION_JSON)
-        .content(JSONObject.toJSONString(sysDept));
+        .content(JSONObject.toJSONString(sysRole));
 
     MvcResult mvcResult = mvc.perform(requestBuilder)
         .andExpect(MockMvcResultMatchers.status().isOk())
@@ -70,15 +75,17 @@ public class SysDeptControllerTest extends Assertions {
 
   @Test
   public void updateById() throws Exception {
-    SysDept sysDept = new SysDept();
-    sysDept.setDeptName("testName02").setDeptCode("testCode002").setParentId("5b823d385b491b33c38c36b05c5abb08");
-    sysDept.setId("f5763e4b26bce83ac15a330fa1d83eac");
-    sysDept.setRemark("remark002");
+    SysRole sysRole = new SysRole();
+    sysRole.setId("66f50c69de7ed0755ee9830cc47556b6");
+    sysRole.setRoleName("testName001").setRoleCode("testCode001update1");
+    List<String> permissions = new ArrayList<>();
+    permissions.add("d48019c64b9011eea1093a31d6d59109");
+    sysRole.setPermissions(permissions);
 
     RequestBuilder requestBuilder = MockMvcRequestBuilders
-        .post("/dept/update")
+        .post("/role/update")
         .contentType(MediaType.APPLICATION_JSON)
-        .content(JSONObject.toJSONString(sysDept));
+        .content(JSONObject.toJSONString(sysRole));
 
     MvcResult mvcResult = mvc.perform(requestBuilder)
         .andExpect(MockMvcResultMatchers.status().isOk())
@@ -87,10 +94,10 @@ public class SysDeptControllerTest extends Assertions {
   }
 
   @Test
-  public void getDeptById() throws Exception {
-    String id = "62e3e55fe284b4c40b88568a0d026036";
+  public void getRoleById() throws Exception {
+    String id = "66f50c69de7ed0755ee9830cc47556b6";
     RequestBuilder requestBuilder = MockMvcRequestBuilders
-        .get("/dept/detail")
+        .get("/role/detail")
         .contentType(MediaType.APPLICATION_JSON)
         .queryParam("id", id);
 
@@ -98,29 +105,31 @@ public class SysDeptControllerTest extends Assertions {
         .andExpect(MockMvcResultMatchers.status().isOk())
         .andDo(MockMvcResultHandlers.print()).andReturn();
     log.info("getDeptById test result: {}", mvcResult.getResponse().getContentAsString());
+
   }
 
   @Test
-  public void deleteDept() throws Exception {
-    String id = "1f5d3d9bdfa4f3cf0aeac05f24417149";
+  public void deleteSysRole() throws Exception {
+    String id = "66f50c69de7ed0755ee9830cc47556b6";
     RequestBuilder requestBuilder = MockMvcRequestBuilders
-        .delete(String.format("/dept/delete/%s", id))
+        .delete(String.format("/role/delete/%s", id))
         .contentType(MediaType.APPLICATION_JSON);
 
     MvcResult mvcResult = mvc.perform(requestBuilder)
         .andExpect(MockMvcResultMatchers.status().isOk())
         .andDo(MockMvcResultHandlers.print()).andReturn();
     log.info("getDeptById test result: {}", mvcResult.getResponse().getContentAsString());
+
   }
 
   @Test
-  public void getDeptPageList() throws Exception {
-    DeptPageParam pageParam = new DeptPageParam();
-    pageParam.setDeptName("01");
-    pageParam.setKeyword("02");
+  public void getRolePageList() throws Exception {
+    RolePageParam pageParam = new RolePageParam();
+//    pageParam.setDeptName("01");
+    pageParam.setKeyword("1");
 
     RequestBuilder requestBuilder = MockMvcRequestBuilders
-        .post("/dept/getPageList")
+        .post("/role/getPageList")
         .contentType(MediaType.APPLICATION_JSON)
         .content(JSONObject.toJSONString(pageParam));
 
@@ -128,15 +137,16 @@ public class SysDeptControllerTest extends Assertions {
         .andExpect(MockMvcResultMatchers.status().isOk())
         .andDo(MockMvcResultHandlers.print()).andReturn();
     log.info("getDeptPageList test result: {}", mvcResult.getResponse().getContentAsString());
+
   }
 
   @Test
-  public void getDeptList() throws Exception {
-    DeptPageParam pageParam = new DeptPageParam();
+  public void getRoleList() throws Exception {
+    RolePageParam pageParam = new RolePageParam();
 //    pageParam.setDeptName("01");
 
     RequestBuilder requestBuilder = MockMvcRequestBuilders
-        .post("/dept/getList")
+        .post("/role/getList")
         .contentType(MediaType.APPLICATION_JSON)
         .content(JSONObject.toJSONString(pageParam));
 
@@ -147,15 +157,4 @@ public class SysDeptControllerTest extends Assertions {
 
   }
 
-  @Test
-  public void getDeptTreeList() throws Exception {
-    RequestBuilder requestBuilder = MockMvcRequestBuilders
-        .get("/dept/getTreeList")
-        .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE);
-
-    String result = mvc.perform(requestBuilder)
-        .andExpect(MockMvcResultMatchers.status().isOk())
-        .andDo(MockMvcResultHandlers.print()).andReturn().getResponse().getContentAsString();
-    log.info("getDeptTreeList test result: {}", result);
-  }
 }

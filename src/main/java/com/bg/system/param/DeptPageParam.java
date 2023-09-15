@@ -1,9 +1,9 @@
 package com.bg.system.param;
 
+import com.bg.commons.enums.StatusEnum;
 import com.bg.commons.pagination.BasePageParam;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serial;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -34,7 +34,7 @@ public class DeptPageParam extends BasePageParam {
   private String parentId;
 
   @Schema(description = "状态，0：禁用，1：启用")
-  private Integer status;
+  private StatusEnum status;
 
 
 }

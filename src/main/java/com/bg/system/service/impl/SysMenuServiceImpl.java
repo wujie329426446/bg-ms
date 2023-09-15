@@ -1,42 +1,34 @@
 package com.bg.system.service.impl;
 
-import cn.hutool.core.util.StrUtil;
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.OrderItem;
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.bg.commons.enums.StateEnum;
+import com.bg.commons.api.ApiCode;
 import com.bg.commons.exception.BusinessException;
-import com.bg.commons.model.RoleModel;
-import com.bg.commons.utils.SecurityUtil;
 import com.bg.system.convert.SysMenuConvertMapper;
+import com.bg.system.convert.SysMenuTreeConvertMapper;
 import com.bg.system.entity.SysMenu;
 import com.bg.system.entity.SysRoleMenu;
-import com.bg.system.enums.FrameEnum;
-import com.bg.system.enums.KeepaliveEnum;
-import com.bg.system.enums.LinkExternalEnum;
 import com.bg.system.enums.MenuLevelEnum;
 import com.bg.system.mapper.SysMenuMapper;
 import com.bg.system.param.MenuPageParam;
 import com.bg.system.service.ISysMenuService;
 import com.bg.system.service.ISysRoleMenuService;
-import com.bg.system.vo.RouteItemVO;
-import com.bg.system.vo.RouteMetoVO;
-import com.bg.system.vo.SysPermissionTreeVo;
-import com.bg.system.vo.SysPermissionVo;
-import com.google.common.collect.Lists;
+import com.bg.system.vo.SysMenuTreeVo;
+import com.bg.system.vo.SysMenuVo;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -55,104 +47,176 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> implements ISysMenuService {
 
-  private final ISysRoleMenuService ISysRoleMenuService;
+  private final ISysRoleMenuService sysRoleMenuService;
+  private final SysMenuTreeConvertMapper sysMenuTreeConvertMapper;
   private final SysMenuConvertMapper sysMenuConvertMapper;
 
   @Transactional(rollbackFor = Exception.class)
   @Override
-  public boolean saveSysPermission(SysMenu sysMenu) {
+  public boolean save(SysMenu sysMenu) {
+    // 新增菜单校验
+    this.saveOrUpdateCheck(sysMenu, FieldFill.INSERT);
     sysMenu.setId(null);
     return super.save(sysMenu);
   }
 
   @Transactional(rollbackFor = Exception.class)
   @Override
-  public boolean updateSysPermission(SysMenu sysMenu) {
-    // 获取权限
-    if (getById(sysMenu.getId()) == null) {
-      throw BusinessException.build("权限不存在");
-    }
-//        sysPermission.setUpdateTime(new Date());
+  public boolean updateById(SysMenu sysMenu) {
+    // 修改菜单校验
+    this.saveOrUpdateCheck(sysMenu, FieldFill.UPDATE);
+
     return super.updateById(sysMenu);
+  }
+
+  private void saveOrUpdateCheck(SysMenu sysMenu, FieldFill fill) {
+    if (Objects.isNull(sysMenu)) {
+      throw BusinessException.build(ApiCode.BUSINESS_EXCEPTION.getCode(), "校验菜单对象为空");
+    }
+
+    // 校验角色name唯一性
+    Boolean isMenuNameExists = sysMenu.selectCount(
+        new LambdaQueryWrapper<SysMenu>().eq(SysMenu::getMenuName, sysMenu.getMenuName()).ne(fill.equals(FieldFill.UPDATE), SysMenu::getId, sysMenu.getId())
+    ) > 0;
+    if (isMenuNameExists) {
+      throw BusinessException.build(ApiCode.BUSINESS_EXCEPTION.getCode(), "菜单名称已存在");
+    }
+
+    if (fill.equals(FieldFill.UPDATE)) {
+      //菜单编码不允许修改,否则会影响到用户关联的权限
+      sysMenu.setCode(null);
+    } else {
+      // 校验角色code唯一性
+      Boolean isCodeExists = sysMenu.selectCount(
+          new LambdaQueryWrapper<SysMenu>().eq(SysMenu::getCode, sysMenu.getCode())
+      ) > 0;
+      if (isCodeExists) {
+        throw BusinessException.build(ApiCode.BUSINESS_EXCEPTION.getCode(), "菜单编码已存在");
+      }
+    }
+  }
+
+  @Override
+  public SysMenuVo getMenuById(String id) {
+    SysMenu sysMenu = super.getById(id);
+    SysMenuVo sysMenuVo = sysMenuConvertMapper.toDto(sysMenu);
+    return sysMenuVo;
   }
 
   @Transactional(rollbackFor = Exception.class)
   @Override
-  public boolean deleteSysPermission(String id) {
-    boolean isExists = ISysRoleMenuService.count(Wrappers.lambdaQuery(SysRoleMenu.class).eq(SysRoleMenu::getPermissionId, id)) > 0;
-    if (isExists) {
-      throw BusinessException.build("该权限存在角色关联关系，不能删除");
-    }
+  public boolean removeById(Serializable id) {
+    // 删除与角色关联关系
+    sysRoleMenuService.remove(Wrappers.lambdaQuery(SysRoleMenu.class).eq(SysRoleMenu::getPermissionId, id));
+    // 删除子menu
+    List<SysMenu> menuList = super.list(Wrappers.lambdaQuery(SysMenu.class).eq(SysMenu::getParentId, id));
+    List<String> ids = menuList.stream().map(i -> i.getId()).collect(Collectors.toList());
+    this.removeChildren(ids);
+    // 删除当前menu
     return super.removeById(id);
   }
 
-  @Override
-  public SysPermissionVo getSysPermissionById(Serializable id) {
-    return baseMapper.getSysPermissionById(id);
+  @Transactional(rollbackFor = Exception.class)
+  void removeChildren(List<String> ids) {
+    if (CollectionUtils.isNotEmpty(ids)) {
+      // 删除与角色关联关系
+      sysRoleMenuService.remove(Wrappers.lambdaQuery(SysRoleMenu.class).in(SysRoleMenu::getPermissionId, ids));
+      // 删除子menu
+      List<SysMenu> menuList = super.list(Wrappers.lambdaQuery(SysMenu.class).in(SysMenu::getParentId, ids));
+      List<String> collect = menuList.stream().map(i -> i.getId()).collect(Collectors.toList());
+      this.removeChildren(collect);
+      // 删除当前menu
+      super.removeByIds(ids);
+    }
   }
 
   @Override
-  public Page<SysPermissionVo> getSysPermissionPageList(MenuPageParam pageParam) {
-    pageParam.pageSortsHandle(OrderItem.desc("create_time"));
-    Page<SysPermissionVo> page = baseMapper.getSysPermissionPageList(pageParam.getPage(), pageParam);
+  public Page<SysMenu> getMenuPageList(MenuPageParam pageParam) {
+    LambdaQueryWrapper<SysMenu> queryWrapper = Wrappers.lambdaQuery(SysMenu.class);
+    String keyword = pageParam.getKeyword();
+    String menuName = pageParam.getMenuName();
+    String code = pageParam.getCode();
+
+    // 条件查询
+    queryWrapper
+        .and(StringUtils.isNotBlank(keyword),
+            i -> i.like(SysMenu::getMenuName, keyword)
+                .or().like(SysMenu::getCode, keyword)
+        )
+        .like(StringUtils.isNotBlank(menuName), SysMenu::getMenuName, menuName)
+        .like(StringUtils.isNotBlank(code), SysMenu::getCode, code)
+        .orderByDesc(SysMenu::getCreateTime);
+
+    Page<SysMenu> page = super.page(pageParam.getPage(), queryWrapper);
     return page;
   }
 
   @Override
-  public boolean isExistsByPermissionIds(List<String> permissionIds) {
-    if (CollectionUtils.isEmpty(permissionIds)) {
-      return false;
+  public List<SysMenuVo> getMenuList(String userId) {
+    List<SysMenu> menuList;
+    if (StringUtils.isNotBlank(userId)) {
+      menuList = baseMapper.getMenuListByUser(userId);
+    } else {
+      menuList = super.list(Wrappers.lambdaQuery(SysMenu.class).orderByDesc(SysMenu::getCreateTime));
     }
-    Wrapper wrapper = lambdaQuery().in(SysMenu::getId, permissionIds).getWrapper();
-    return baseMapper.selectCount(wrapper).intValue() == permissionIds.size();
+
+    return sysMenuConvertMapper.toDto(menuList);
   }
 
   @Override
-  public List<SysMenu> getAllMenuList() {
-    SysMenu sysMenu = new SysMenu();
-    sysMenu.setStatus(StateEnum.ENABLE.getCode());
-    // 获取所有已启用的权限列表
-    return baseMapper.selectList(new QueryWrapper(sysMenu));
-  }
-
-  @Override
-  public List<SysPermissionTreeVo> getAllMenuTree() {
-    List<SysMenu> list = getAllMenuList();
+  public List<SysMenuTreeVo> getMenuTree(String userId) {
+    List<SysMenu> menuList;
+    if (StringUtils.isNotBlank(userId)) {
+      menuList = baseMapper.getMenuListByUser(userId);
+    } else {
+      menuList = super.list(Wrappers.lambdaQuery(SysMenu.class).orderByDesc(SysMenu::getCreateTime));
+    }
     // 转换成树形菜单
-    List<SysPermissionTreeVo> treeVos = convertSysPermissionTreeVoList(list);
-    return treeVos;
+    List<SysMenuTreeVo> menuTreeList = this.convertToTree(menuList);
+    return menuTreeList;
   }
 
   @Override
-  public List<SysPermissionTreeVo> convertSysPermissionTreeVoList(List<SysMenu> list) {
+  public Set<String> getCodesByUser(String userId) {
+    return baseMapper.getCodesByUser(userId);
+  }
+
+  @Override
+  public List<SysMenuVo> getMenuListByRole(String roleId) {
+    List<SysMenu> menuList = baseMapper.getMenuListByRole(roleId);
+    List<SysMenuVo> sysMenuVoList = sysMenuConvertMapper.toDto(menuList);
+    return sysMenuVoList;
+  }
+
+  private List<SysMenuTreeVo> convertToTree(List<SysMenu> list) {
     if (CollectionUtils.isEmpty(list)) {
-      throw new IllegalArgumentException("SysPermission列表不能为空");
+      return new ArrayList<>();
     }
     // 按level分组获取map
-    Map<Integer, List<SysMenu>> map = list.stream().collect(Collectors.groupingBy(SysMenu::getLevel));
-    List<SysPermissionTreeVo> treeVos = new ArrayList<>();
+    Map<MenuLevelEnum, List<SysMenu>> map = list.stream().collect(Collectors.groupingBy(SysMenu::getLevel));
+    List<SysMenuTreeVo> treeVos = new ArrayList<>();
     // 循环获取三级菜单树形集合
-    for (SysMenu one : map.get(MenuLevelEnum.ONE.getCode())) {
-      SysPermissionTreeVo oneVo = sysMenuConvertMapper.toDto(one);
+    for (SysMenu one : map.get(MenuLevelEnum.ONE)) {
+      SysMenuTreeVo oneVo = sysMenuTreeConvertMapper.toDto(one);
       String oneParentId = oneVo.getParentId();
       if (oneParentId == null) {
         treeVos.add(oneVo);
       }
-      List<SysMenu> twoList = map.get(MenuLevelEnum.TWO.getCode());
+      List<SysMenu> twoList = map.get(MenuLevelEnum.TWO);
       if (CollectionUtils.isNotEmpty(twoList)) {
         for (SysMenu two : twoList) {
-          SysPermissionTreeVo twoVo = sysMenuConvertMapper.toDto(two);
+          SysMenuTreeVo twoVo = sysMenuTreeConvertMapper.toDto(two);
           if (two.getParentId().equals(one.getId())) {
             if (oneVo.getChildren() == null) {
               oneVo.setChildren(new ArrayList<>());
             }
             oneVo.getChildren().add(twoVo);
           }
-          List<SysMenu> threeList = map.get(MenuLevelEnum.THREE.getCode());
+          List<SysMenu> threeList = map.get(MenuLevelEnum.THREE);
           if (CollectionUtils.isNotEmpty(threeList)) {
             for (SysMenu three : threeList) {
               if (three.getParentId().equals(two.getId())) {
-                SysPermissionTreeVo threeVo = sysMenuConvertMapper.toDto(three);
+                SysMenuTreeVo threeVo = sysMenuTreeConvertMapper.toDto(three);
                 if (twoVo.getChildren() == null) {
                   twoVo.setChildren(new ArrayList<>());
                 }
@@ -162,141 +226,9 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
           }
         }
       }
-
     }
     return treeVos;
   }
 
-  @Override
-  public Set<String> getPermissionCodesByUserId(String userId) {
-    return baseMapper.getPermissionCodesByUserId(userId);
-  }
-
-  @Override
-  public List<SysMenu> getMenuListByUserId(String userId) {
-    return baseMapper.getMenuListByUserId(userId);
-  }
-
-  @Override
-  public List<SysPermissionTreeVo> getMenuTreeByUserId(String userId) {
-    List<SysMenu> list = getMenuListByUserId(userId);
-    // 转换成树形菜单
-    List<SysPermissionTreeVo> treeVos = convertSysPermissionTreeVoList(list);
-    return treeVos;
-  }
-
-  @Override
-  public List<String> getPermissionIdsByRoleId(String roleId) {
-
-    // 根据角色id获取该对应的所有三级权限ID
-
-    return null;
-  }
-
-  @Override
-  public List<String> getThreeLevelPermissionIdsByRoleId(String roleId) {
-    return baseMapper.getThreeLevelPermissionIdsByRoleId(roleId);
-  }
-
-  @Override
-  public List<SysPermissionTreeVo> getNavMenuTree() {
-    List<Integer> levels = Arrays.asList(MenuLevelEnum.ONE.getCode(), MenuLevelEnum.TWO.getCode());
-    Wrapper wrapper = lambdaQuery()
-        .in(SysMenu::getLevel, levels)
-        .eq(SysMenu::getStatus, StateEnum.ENABLE.getCode())
-        .getWrapper();
-
-    List<SysMenu> list = baseMapper.selectList(wrapper);
-
-    return convertSysPermissionTreeVoList(list);
-
-  }
-
-  @Override
-  public List<SysMenu> listRoleMenus(String roleId) {
-    // TODO: 2023/9/1 优化查询，不要遍历查子集
-    List<SysRoleMenu> sysRoleMenuList = ISysRoleMenuService.list(Wrappers.lambdaQuery(SysRoleMenu.class).eq(SysRoleMenu::getRoleId, roleId));
-    return sysRoleMenuList.stream().map(item ->
-        this.getById(item.getPermissionId())
-    ).collect(Collectors.toList());
-  }
-
-  @Override
-  public List<RouteItemVO> getMenuList() {
-    List<SysMenu> sysMenus;
-    // 查询菜单
-    List<String> roleIdList = SecurityUtil.getRoles().stream().map(RoleModel::getId).collect(Collectors.toList());
-    List<SysRoleMenu> sysRoleMenuList = new SysRoleMenu().selectList(
-        new QueryWrapper<SysRoleMenu>().lambda().in(SysRoleMenu::getRoleId, roleIdList));
-    if (sysRoleMenuList.isEmpty()) {
-      sysMenus = Lists.newArrayList();
-    } else {
-      Set<String> menuIds = sysRoleMenuList.stream().map(SysRoleMenu::getPermissionId).collect(Collectors.toSet());
-      sysMenus = this.list(Wrappers.lambdaQuery(SysMenu.class)
-          .in(SysMenu::getLevel, MenuLevelEnum.ONE.getCode(), MenuLevelEnum.TWO.getCode())
-          .in(SysMenu::getId, menuIds)
-          .orderByAsc(SysMenu::getSort)
-      );
-    }
-
-    List<RouteItemVO> routeItemVOList = sysMenus.stream().filter(item -> item.getParentId() == null).map(item -> {
-      RouteItemVO node = new RouteItemVO();
-      node.setRoutePath(item.getLevel().equals(MenuLevelEnum.ONE.getCode()) ? "/" + item.getRoutePath() : item.getRoutePath());
-
-      node.setComponent(item.getLevel().equals(MenuLevelEnum.ONE.getCode()) && item.getParentId() == null ? "LAYOUT" : item.getComponent());
-
-      node.setName(StrUtil.upperFirst(item.getRoutePath()));
-      node.setMeta(new RouteMetoVO());
-
-      RouteMetoVO routeMetoVO = new RouteMetoVO();
-      routeMetoVO.setTitle(item.getMenuName());
-      routeMetoVO.setIcon(item.getIcon());
-      if (item.getLevel().equals(MenuLevelEnum.TWO.getCode())) {
-        routeMetoVO.setIgnoreKeepAlive(item.getKeepAlive().equals(KeepaliveEnum.YES.getCode()));
-        if (item.getIsExt().equals(LinkExternalEnum.YES.getCode())) {
-          if (item.getFrame().equals(FrameEnum.YES.getCode())) {
-            routeMetoVO.setFrameSrc(item.getComponent());
-          }
-          if (item.getFrame().equals(FrameEnum.NO.getCode())) {
-            node.setRoutePath(item.getComponent());
-          }
-        }
-      }
-      node.setMeta(routeMetoVO);
-      node.setChildren(getChildrenList(item, sysMenus));
-      return node;
-    }).collect(Collectors.toList());
-    return routeItemVOList;
-  }
-
-  private List<RouteItemVO> getChildrenList(SysMenu root, List<SysMenu> list) {
-    List<RouteItemVO> childrenList = list.stream().filter(item -> item.getParentId() != null && item.getParentId().equals(root.getId())).map(item -> {
-      RouteItemVO node = new RouteItemVO();
-      node.setRoutePath(item.getLevel().equals(MenuLevelEnum.ONE.getCode()) ? "/" + item.getRoutePath() : item.getRoutePath());
-      node.setComponent(item.getLevel().equals(MenuLevelEnum.ONE.getCode()) && item.getParentId() == null ? "LAYOUT" : item.getComponent());
-      node.setName(StrUtil.upperFirst(item.getRoutePath()));
-      node.setMeta(new RouteMetoVO());
-
-      RouteMetoVO routeMetoVO = new RouteMetoVO();
-      routeMetoVO.setTitle(item.getMenuName());
-      routeMetoVO.setIcon(item.getIcon());
-      routeMetoVO.setHideMenu(item.getIsShow() == 0);
-      if (item.getLevel().equals(MenuLevelEnum.TWO.getCode())) {
-        routeMetoVO.setIgnoreKeepAlive(!item.getKeepAlive().equals(KeepaliveEnum.YES.getCode()));
-        if (item.getIsExt().equals(LinkExternalEnum.YES.getCode())) {
-          if (item.getFrame().equals(FrameEnum.YES.getCode())) {
-            routeMetoVO.setFrameSrc(item.getComponent());
-          }
-          if (item.getFrame().equals(FrameEnum.NO.getCode())) {
-            node.setRoutePath(item.getComponent());
-          }
-        }
-      }
-      node.setMeta(routeMetoVO);
-      node.setChildren(getChildrenList(item, list));
-      return node;
-    }).collect(Collectors.toList());
-    return childrenList;
-  }
 
 }

@@ -252,7 +252,7 @@ public class SysDeptController extends BaseController<SysDept, ISysDeptService, 
     return ApiResult.success(list);
   }
 
-  @GetMapping("/getTreeList")
+  @GetMapping("/getTree")
   @PreAuthorize("@auth.hasPermission('sys:department:tree')")
   @OperationLog(name = "获取树形列表", type = OperationLogType.OTHER_QUERY)
   @Operation(

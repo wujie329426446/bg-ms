@@ -1,11 +1,12 @@
 package com.bg.system.controller;
 
 import com.alibaba.fastjson2.JSONObject;
-import com.bg.system.entity.SysDept;
-import com.bg.system.param.DeptPageParam;
-import com.bg.system.service.ISysDeptService;
+import com.bg.system.entity.SysMenu;
+import com.bg.system.enums.MenuLevelEnum;
+import com.bg.system.enums.MenuTypeEnum;
+import com.bg.system.param.MenuPageParam;
+import com.bg.system.service.ISysMenuService;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -25,21 +26,21 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
  * @ProjectName: bg-ms
  * @Author: jiewus
  * @Description:
- * @Date: 2023/9/13 15:44
+ * @Date: 2023/9/15 11:06
  */
 @SpringBootTest
 @Slf4j
-public class SysDeptControllerTest extends Assertions {
+public class SysMenuControllerTest {
 
   private MockMvc mvc;
   @InjectMocks
-  private SysDeptController baseController;
+  private SysMenuController baseController;
   @Autowired
-  private ISysDeptService baseService;
+  private ISysMenuService baseService;
 
   @BeforeEach
-  public void setup() {
-    //é€šè¿‡ReflectionTestUtilsæ³¨å…¥service
+  void setUp() {
+    //Í¨¹ýReflectionTestUtils×¢Èëservice
     ReflectionTestUtils.setField(baseController, "baseService", baseService);
 
     mvc = MockMvcBuilders.standaloneSetup(baseController)
@@ -52,15 +53,15 @@ public class SysDeptControllerTest extends Assertions {
 
   @Test
   public void save() throws Exception {
-    SysDept sysDept = new SysDept();
-    sysDept.setDeptName("testName041").setDeptCode("testCode041");
-    sysDept.setRemark("test041");
-    sysDept.setParentId("1f5d3d9bdfa4f3cf0aeac05f24417149");
+    SysMenu sysMenu = new SysMenu();
+    sysMenu.setMenuName("testName112").setCode("testCode112").setLevel(MenuLevelEnum.THREE).setType(MenuTypeEnum.THREE);
+    sysMenu.setRemark("test112");
+    sysMenu.setParentId("11814120ca56ccb80f637d2d410386de");
 
     RequestBuilder requestBuilder = MockMvcRequestBuilders
-        .post("/dept/add")
+        .post("/menu/add")
         .contentType(MediaType.APPLICATION_JSON)
-        .content(JSONObject.toJSONString(sysDept));
+        .content(JSONObject.toJSONString(sysMenu));
 
     MvcResult mvcResult = mvc.perform(requestBuilder)
         .andExpect(MockMvcResultMatchers.status().isOk())
@@ -70,15 +71,16 @@ public class SysDeptControllerTest extends Assertions {
 
   @Test
   public void updateById() throws Exception {
-    SysDept sysDept = new SysDept();
-    sysDept.setDeptName("testName02").setDeptCode("testCode002").setParentId("5b823d385b491b33c38c36b05c5abb08");
-    sysDept.setId("f5763e4b26bce83ac15a330fa1d83eac");
-    sysDept.setRemark("remark002");
+    SysMenu sysMenu = new SysMenu();
+    sysMenu.setMenuName("testName11222").setCode("testCode112").setLevel(MenuLevelEnum.THREE).setType(MenuTypeEnum.THREE);
+    sysMenu.setRemark("test11222");
+    sysMenu.setParentId("11814120ca56ccb80f637d2d410386de");
+    sysMenu.setId("491545f117b9fdf8078acfe72ef5aecd");
 
     RequestBuilder requestBuilder = MockMvcRequestBuilders
-        .post("/dept/update")
+        .post("/menu/update")
         .contentType(MediaType.APPLICATION_JSON)
-        .content(JSONObject.toJSONString(sysDept));
+        .content(JSONObject.toJSONString(sysMenu));
 
     MvcResult mvcResult = mvc.perform(requestBuilder)
         .andExpect(MockMvcResultMatchers.status().isOk())
@@ -87,10 +89,10 @@ public class SysDeptControllerTest extends Assertions {
   }
 
   @Test
-  public void getDeptById() throws Exception {
-    String id = "62e3e55fe284b4c40b88568a0d026036";
+  public void getMenuById() throws Exception {
+    String id = "11814120ca56ccb80f637d2d410386de";
     RequestBuilder requestBuilder = MockMvcRequestBuilders
-        .get("/dept/detail")
+        .get("/menu/detail")
         .contentType(MediaType.APPLICATION_JSON)
         .queryParam("id", id);
 
@@ -101,61 +103,90 @@ public class SysDeptControllerTest extends Assertions {
   }
 
   @Test
-  public void deleteDept() throws Exception {
-    String id = "1f5d3d9bdfa4f3cf0aeac05f24417149";
+  public void deleteSysMenu() throws Exception {
+    String id = "80a091a0b9fe529cc1e8c41afb6f04f6";
     RequestBuilder requestBuilder = MockMvcRequestBuilders
-        .delete(String.format("/dept/delete/%s", id))
+        .delete(String.format("/menu/delete/%s", id))
         .contentType(MediaType.APPLICATION_JSON);
 
     MvcResult mvcResult = mvc.perform(requestBuilder)
         .andExpect(MockMvcResultMatchers.status().isOk())
         .andDo(MockMvcResultHandlers.print()).andReturn();
-    log.info("getDeptById test result: {}", mvcResult.getResponse().getContentAsString());
+    log.info("deleteSysMenu test result: {}", mvcResult.getResponse().getContentAsString());
   }
 
   @Test
-  public void getDeptPageList() throws Exception {
-    DeptPageParam pageParam = new DeptPageParam();
-    pageParam.setDeptName("01");
-    pageParam.setKeyword("02");
+  public void getMenuPageList() throws Exception {
+    MenuPageParam pageParam = new MenuPageParam();
+//    pageParam.setMenuName("01");
+    pageParam.setKeyword("1");
 
     RequestBuilder requestBuilder = MockMvcRequestBuilders
-        .post("/dept/getPageList")
+        .post("/menu/getPageList")
         .contentType(MediaType.APPLICATION_JSON)
         .content(JSONObject.toJSONString(pageParam));
 
     MvcResult mvcResult = mvc.perform(requestBuilder)
         .andExpect(MockMvcResultMatchers.status().isOk())
         .andDo(MockMvcResultHandlers.print()).andReturn();
-    log.info("getDeptPageList test result: {}", mvcResult.getResponse().getContentAsString());
+    log.info("getMenuPageList test result: {}", mvcResult.getResponse().getContentAsString());
   }
 
   @Test
-  public void getDeptList() throws Exception {
-    DeptPageParam pageParam = new DeptPageParam();
-//    pageParam.setDeptName("01");
+  public void getMenuList() throws Exception {
+    String userId = "a0d35e0bf436fd37d2796caf333ac374";
 
     RequestBuilder requestBuilder = MockMvcRequestBuilders
-        .post("/dept/getList")
+        .post("/menu/getList")
         .contentType(MediaType.APPLICATION_JSON)
-        .content(JSONObject.toJSONString(pageParam));
+        .queryParam("userId", userId);
 
     MvcResult mvcResult = mvc.perform(requestBuilder)
         .andExpect(MockMvcResultMatchers.status().isOk())
         .andDo(MockMvcResultHandlers.print()).andReturn();
-    log.info("getDeptList test result: {}", mvcResult.getResponse().getContentAsString());
-
+    log.info("getMenuList test result: {}", mvcResult.getResponse().getContentAsString());
   }
 
   @Test
-  public void getDeptTreeList() throws Exception {
+  public void getMenuTree() throws Exception {
+    String userId = "a0d35e0bf436fd37d2796caf333ac374";
     RequestBuilder requestBuilder = MockMvcRequestBuilders
-        .get("/dept/getTreeList")
+        .get("/menu/getTree")
         .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE);
+//        .queryParam("userId", userId);
 
     String result = mvc.perform(requestBuilder)
         .andExpect(MockMvcResultMatchers.status().isOk())
         .andDo(MockMvcResultHandlers.print()).andReturn().getResponse().getContentAsString();
-    log.info("getDeptTreeList test result: {}", result);
+    log.info("getMenuTree test result: {}", result);
+  }
+
+
+  @Test
+  public void getCodesByUser() throws Exception {
+    String userId = "a0d35e0bf436fd37d2796caf333ac374";
+    RequestBuilder requestBuilder = MockMvcRequestBuilders
+        .get("/menu/getCodesByUserId")
+        .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+        .queryParam("userId", userId);
+
+    String result = mvc.perform(requestBuilder)
+        .andExpect(MockMvcResultMatchers.status().isOk())
+        .andDo(MockMvcResultHandlers.print()).andReturn().getResponse().getContentAsString();
+    log.info("getCodesByUser test result: {}", result);
+  }
+
+  @Test
+  public void getListByRole() throws Exception {
+    String roleId = "f0980292de98d8c5a6d40f26581018b6";
+    RequestBuilder requestBuilder = MockMvcRequestBuilders
+        .get("/menu/listRoleMenus")
+        .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+        .queryParam("roleId", roleId);
+
+    String result = mvc.perform(requestBuilder)
+        .andExpect(MockMvcResultMatchers.status().isOk())
+        .andDo(MockMvcResultHandlers.print()).andReturn().getResponse().getContentAsString();
+    log.info("listRoleMenus test result: {}", result);
   }
 }

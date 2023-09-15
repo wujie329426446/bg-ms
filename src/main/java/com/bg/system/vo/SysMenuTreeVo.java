@@ -1,13 +1,13 @@
 package com.bg.system.vo;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import com.bg.commons.enums.StatusEnum;
+import com.bg.system.enums.MenuLevelEnum;
+import com.bg.system.enums.MenuTypeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.io.Serializable;
+import java.util.List;
 import lombok.Data;
 import lombok.experimental.Accessors;
-
-import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.util.List;
 
 /**
  * 系统权限树形列表VO
@@ -17,7 +17,7 @@ import java.util.List;
 @Data
 @Accessors(chain = true)
 @Schema(description = "系统权限树形列表")
-public class SysPermissionTreeVo implements Serializable {
+public class SysMenuTreeVo implements Serializable {
 
   private static final long serialVersionUID = 2738804574228359190L;
 
@@ -39,14 +39,14 @@ public class SysPermissionTreeVo implements Serializable {
   @Schema(description = "图标")
   private String icon;
 
-  @Schema(description = "类型，1：菜单，2：按钮")
-  private Integer type;
+  @Schema(description = "类型，1：目录，2：菜单，3：按钮")
+  private MenuTypeEnum type;
 
   @Schema(description = "层级，1：第一级，2：第二级，N：第N级")
-  private Integer level;
+  private MenuLevelEnum level;
 
   @Schema(description = "状态，0：禁用，1：启用")
-  private Integer state;
+  private StatusEnum status;
 
   @Schema(description = "排序")
   private Integer sort;
@@ -54,24 +54,19 @@ public class SysPermissionTreeVo implements Serializable {
   @Schema(description = "备注")
   private String remark;
 
-  @Schema(description = "版本")
-  private Integer version;
-
-  @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-  @Schema(description = "创建时间")
-  private LocalDateTime createTime;
-
-  @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-  @Schema(description = "修改时间")
-  private LocalDateTime updateTime;
-
-  @Schema(description = "子节点集合")
-  private List<SysPermissionTreeVo> children;
-
   @Schema(description = "组件")
   private String component;
 
+  @Schema(description = "isShow")
   private Integer isShow;
+
+  @Schema(description = "keepAlive")
   private Integer keepAlive;
+
+  @Schema(description = "isExt")
   private Integer isExt;
+
+  @Schema(description = "子节点集合")
+  private List<SysMenuTreeVo> children;
+
 }

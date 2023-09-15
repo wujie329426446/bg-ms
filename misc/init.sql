@@ -14,7 +14,11 @@ create table sys_log
 (
     id                varchar(32)   not null comment '主键',
     trace_id          varchar(32)   null comment '日志链路ID',
-    request_time      varchar(30)   null comment '请求时间',
+    request_ip        varchar(15)   null comment '请求ip',
+    request_time      datetime      null comment '请求时间',
+    response_time     datetime      null comment '响应时间',
+    diff_time         bigint        null comment '耗时，单位：毫秒',
+    diff_time_desc    varchar(100)  null comment '耗时描述',
     request_url       varchar(1000) null comment '全路径',
     permission_code   varchar(200)  null comment '权限编码',
     log_name          varchar(200)  null comment '日志名称',
@@ -28,22 +32,18 @@ create table sys_log
     request_param     text          null comment '请求参数',
     user_id           varchar(32)   null comment '用户ID',
     user_name         varchar(100)  null comment '用户名',
-    request_ip        varchar(15)   null comment '请求ip',
     ip_country        varchar(100)  null comment 'IP国家',
     ip_province       varchar(100)  null comment 'IP省份',
     ip_city           varchar(100)  null comment 'IP城市',
     ip_area_desc      varchar(100)  null comment 'IP区域描述',
     ip_isp            varchar(100)  null comment 'IP运营商',
     log_type          int           default 0 not null comment '0:其它,1:新增,2:修改,3:删除,4:详情查询,5:所有列表,6:分页列表,7:其它查询,8:上传文件',
-    response_time     varchar(100)  null comment '响应时间',
     response_success  tinyint(1)    null comment '0:失败,1:成功',
     response_code     int           null comment '响应结果状态码',
     response_message  text          null comment '响应结果消息',
     response_data     text          null comment '响应数据',
     exception_name    varchar(200)  null comment '异常类名称',
     exception_message text          null comment '异常信息',
-    diff_time         bigint        null comment '耗时，单位：毫秒',
-    diff_time_desc    varchar(100)  null comment '耗时描述',
     referer           varchar(1000) null comment '请求来源地址',
     origin            varchar(1000) null comment '请求来源服务名',
     source_type       varchar(100)  null comment '请求来源类型',
@@ -51,9 +51,6 @@ create table sys_log
     platform_name     varchar(100)  null comment '平台名称',
     browser_name      varchar(100)  null comment '浏览器名称',
     user_agent        varchar(1000) null comment '用户环境',
-    remark            varchar(512)  null comment '备注',
-    create_time       datetime      default null comment '创建时间',
-    update_time       datetime      default null comment '修改时间',
     primary key (`id`) using btree
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=COMPACT COMMENT='操作日志类';
 --
@@ -151,7 +148,7 @@ CREATE TABLE `sys_menu`
     `level`         int                 not null comment '层级，1：第一级，2：第二级，n：第n级',
     `sort`          int                 not null default '0' comment '排序',
     `component`     varchar(255)        default null comment '组件',
-    `is_show`       int                 default null,
+    `is_show`       int                 default '1' comment '是否展示，0：否，1：是',
     `keep_alive`    int                 default null,
     `is_ext`        int                 default null,
     `frame`         int                 default null,
@@ -214,8 +211,6 @@ INSERT INTO `sys_menu` (`id`, `menu_name`, `parent_id`, `route_path`, `code`, `i
 VALUES ('4f410ca14b9211eea1093a31d6d59109', '角色分页列表', '598f87f64b9111eea1093a31d6d59109', NULL, 'sys:role:page', NULL, 3, 3, 1, 5, NULL, 0, NULL, 1, 1, 0, NULL);
 INSERT INTO `sys_menu` (`id`, `menu_name`, `parent_id`, `route_path`, `code`, `icon`, `type`, `level`, `status`, `sort`, `remark`, `version`, `component`, `is_show`, `keep_alive`, `is_ext`, `frame`)
 VALUES ('55d4960d4b9211eea1093a31d6d59109', '角色列表', '598f87f64b9111eea1093a31d6d59109', NULL, 'sys:role:list', NULL, 3, 3, 1, 6, NULL, 0, NULL, 1, 1, 0, NULL);
-INSERT INTO `sys_menu` (`id`, `menu_name`, `parent_id`, `route_path`, `code`, `icon`, `type`, `level`, `status`, `sort`, `remark`, `version`, `component`, `is_show`, `keep_alive`, `is_ext`, `frame`)
-VALUES ('5deb7d764b9211eea1093a31d6d59109', '角色权限ID列表', '598f87f64b9111eea1093a31d6d59109', NULL, 'sys:permission:three-ids-by-role-id', NULL, 3, 3, 1, 7, NULL, 0, NULL, 1, 1, 0, NULL);
 -- 权限管理
 INSERT INTO `sys_menu` (`id`, `menu_name`, `parent_id`, `route_path`, `code`, `icon`, `type`, `level`, `status`, `sort`, `remark`, `version`, `component`, `is_show`, `keep_alive`, `is_ext`, `frame`)
 VALUES ('8a6da18a4b9111eea1093a31d6d59109', '权限管理', 'd48019c64b9011eea1093a31d6d59109', 'permission', 'sys:permission:management', NULL, 2, 2, 1, 3, NULL, 0, '/sys/menu/index', 1, 1, 0, NULL);
@@ -230,13 +225,9 @@ VALUES ('7bd216c14b9211eea1093a31d6d59109', '权限详情', '8a6da18a4b9111eea10
 INSERT INTO `sys_menu` (`id`, `menu_name`, `parent_id`, `route_path`, `code`, `icon`, `type`, `level`, `status`, `sort`, `remark`, `version`, `component`, `is_show`, `keep_alive`, `is_ext`, `frame`)
 VALUES ('8394c7374b9211eea1093a31d6d59109', '权限分页列表', '8a6da18a4b9111eea1093a31d6d59109', NULL, 'sys:permission:page', NULL, 3, 3, 1, 5, NULL, 0, NULL, 1, 1, 0, NULL);
 INSERT INTO `sys_menu` (`id`, `menu_name`, `parent_id`, `route_path`, `code`, `icon`, `type`, `level`, `status`, `sort`, `remark`, `version`, `component`, `is_show`, `keep_alive`, `is_ext`, `frame`)
-VALUES ('8b4e4fd94b9211eea1093a31d6d59109', '权限所有列表', '8a6da18a4b9111eea1093a31d6d59109', NULL, 'sys:permission:all:menu:list', NULL, 3, 3, 1, 6, NULL, 0, NULL, 1, 1, 0, NULL);
+VALUES ('9acce4f44b9211eea1093a31d6d59109', '权限用户列表', '8a6da18a4b9111eea1093a31d6d59109', NULL, 'sys:permission:list', NULL, 3, 3, 1, 8, NULL, 0, NULL, 1, 1, 0, NULL);
 INSERT INTO `sys_menu` (`id`, `menu_name`, `parent_id`, `route_path`, `code`, `icon`, `type`, `level`, `status`, `sort`, `remark`, `version`, `component`, `is_show`, `keep_alive`, `is_ext`, `frame`)
-VALUES ('924e7e284b9211eea1093a31d6d59109', '权限所有树形列表', '8a6da18a4b9111eea1093a31d6d59109', NULL, 'sys:permission:all:menu:tree', NULL, 3, 3, 1, 7, NULL, 0, NULL, 1, 1, 0, NULL);
-INSERT INTO `sys_menu` (`id`, `menu_name`, `parent_id`, `route_path`, `code`, `icon`, `type`, `level`, `status`, `sort`, `remark`, `version`, `component`, `is_show`, `keep_alive`, `is_ext`, `frame`)
-VALUES ('9acce4f44b9211eea1093a31d6d59109', '权限用户列表', '8a6da18a4b9111eea1093a31d6d59109', NULL, 'sys:permission:menu:list', NULL, 3, 3, 1, 8, NULL, 0, NULL, 1, 1, 0, NULL);
-INSERT INTO `sys_menu` (`id`, `menu_name`, `parent_id`, `route_path`, `code`, `icon`, `type`, `level`, `status`, `sort`, `remark`, `version`, `component`, `is_show`, `keep_alive`, `is_ext`, `frame`)
-VALUES ('a5b3b42b4b9211eea1093a31d6d59109', '权限用户树形列表', '8a6da18a4b9111eea1093a31d6d59109', NULL, 'sys:permission:menu:tree', NULL, 3, 3, 1, 9, NULL, 0, NULL, 1, 1, 0, NULL);
+VALUES ('a5b3b42b4b9211eea1093a31d6d59109', '权限用户树形列表', '8a6da18a4b9111eea1093a31d6d59109', NULL, 'sys:permission:tree', NULL, 3, 3, 1, 9, NULL, 0, NULL, 1, 1, 0, NULL);
 INSERT INTO `sys_menu` (`id`, `menu_name`, `parent_id`, `route_path`, `code`, `icon`, `type`, `level`, `status`, `sort`, `remark`, `version`, `component`, `is_show`, `keep_alive`, `is_ext`, `frame`)
 VALUES ('ad51cd784b9211eea1093a31d6d59109', '权限用户代码列表', '8a6da18a4b9111eea1093a31d6d59109', NULL, 'sys:permission:codes', NULL, 3, 3, 1, 19, NULL, 0, NULL, 1, 1, 0, NULL);
 INSERT INTO `sys_menu` (`id`, `menu_name`, `parent_id`, `route_path`, `code`, `icon`, `type`, `level`, `status`, `sort`, `remark`, `version`, `component`, `is_show`, `keep_alive`, `is_ext`, `frame`)
@@ -374,8 +365,6 @@ VALUES ('1598e6cb4b8f11eea1093a31d6d59109', 'db3b2e464b8f11eea1093a31d6d59109', 
 INSERT INTO `sys_role_menu` (`id`, `role_id`, `permission_id`, `status`, `remark`, `version`)
 VALUES ('1a7f459c4b8f11eea1093a31d6d59109', 'db3b2e464b8f11eea1093a31d6d59109', '55d4960d4b9211eea1093a31d6d59109', 1, 'init', 0);
 INSERT INTO `sys_role_menu` (`id`, `role_id`, `permission_id`, `status`, `remark`, `version`)
-VALUES ('1e0629554b8f11eea1093a31d6d59109', 'db3b2e464b8f11eea1093a31d6d59109', '5deb7d764b9211eea1093a31d6d59109', 1, 'init', 0);
-INSERT INTO `sys_role_menu` (`id`, `role_id`, `permission_id`, `status`, `remark`, `version`)
 VALUES ('211572514b8f11eea1093a31d6d59109', 'db3b2e464b8f11eea1093a31d6d59109', '66879d214b9211eea1093a31d6d59109', 1, 'init', 0);
 INSERT INTO `sys_role_menu` (`id`, `role_id`, `permission_id`, `status`, `remark`, `version`)
 VALUES ('2435eea34b8f11eea1093a31d6d59109', 'db3b2e464b8f11eea1093a31d6d59109', '6e03ce8a4b9211eea1093a31d6d59109', 1, 'init', 0);
@@ -385,10 +374,6 @@ INSERT INTO `sys_role_menu` (`id`, `role_id`, `permission_id`, `status`, `remark
 VALUES ('2a3e0de74b8f11eea1093a31d6d59109', 'db3b2e464b8f11eea1093a31d6d59109', '7bd216c14b9211eea1093a31d6d59109', 1, 'init', 0);
 INSERT INTO `sys_role_menu` (`id`, `role_id`, `permission_id`, `status`, `remark`, `version`)
 VALUES ('2d5bf01f4b8f11eea1093a31d6d59109', 'db3b2e464b8f11eea1093a31d6d59109', '8394c7374b9211eea1093a31d6d59109', 1, 'init', 0);
-INSERT INTO `sys_role_menu` (`id`, `role_id`, `permission_id`, `status`, `remark`, `version`)
-VALUES ('32d95d8a4b8f11eea1093a31d6d59109', 'db3b2e464b8f11eea1093a31d6d59109', '8b4e4fd94b9211eea1093a31d6d59109', 1, 'init', 0);
-INSERT INTO `sys_role_menu` (`id`, `role_id`, `permission_id`, `status`, `remark`, `version`)
-VALUES ('36b847cc4b8f11eea1093a31d6d59109', 'db3b2e464b8f11eea1093a31d6d59109', '924e7e284b9211eea1093a31d6d59109', 1, 'init', 0);
 INSERT INTO `sys_role_menu` (`id`, `role_id`, `permission_id`, `status`, `remark`, `version`)
 VALUES ('45f006564b8f11eea1093a31d6d59109', 'db3b2e464b8f11eea1093a31d6d59109', '9acce4f44b9211eea1093a31d6d59109', 1, 'init', 0);
 INSERT INTO `sys_role_menu` (`id`, `role_id`, `permission_id`, `status`, `remark`, `version`)

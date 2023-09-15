@@ -1,7 +1,7 @@
 package com.bg.framework.annotation;
 
 
-import com.bg.commons.enums.SysLogEnum;
+import com.bg.commons.enums.LogTypeEnum;
 
 /**
  * @author jiewus
@@ -17,6 +17,6 @@ public @interface Log {
   String value() default "";
 
 
-  SysLogEnum type() default SysLogEnum.OTHER;
+  LogTypeEnum type() default LogTypeEnum.OTHER;
 
 }

@@ -8,6 +8,8 @@ import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.Version;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
 import com.bg.commons.core.validator.groups.Update;
+import com.bg.commons.enums.DeletedEnum;
+import com.bg.commons.enums.StatusEnum;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -21,7 +23,6 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.experimental.Accessors;
 
 /**
  * @author jiewus
@@ -45,7 +46,7 @@ public abstract class BaseEntity<T extends Model<?>> extends Model<T> implements
   private Integer version;
 
   @Schema(description = "创建时间", hidden = true)
-  @TableField(fill = FieldFill.INSERT)
+  @TableField(value = "create_time", fill = FieldFill.INSERT)
   @Null(message = "创建时间不用传")
   @JsonDeserialize(using = LocalDateTimeDeserializer.class)
   @JsonSerialize(using = LocalDateTimeSerializer.class)
@@ -61,7 +62,7 @@ public abstract class BaseEntity<T extends Model<?>> extends Model<T> implements
   private String creatorName;
 
   @Schema(description = "修改时间", hidden = true)
-  @TableField(fill = FieldFill.INSERT_UPDATE)
+  @TableField(value = "update_time", fill = FieldFill.INSERT_UPDATE)
   @Null(message = "修改时间不用传")
   @JsonDeserialize(using = LocalDateTimeDeserializer.class)
   @JsonSerialize(using = LocalDateTimeSerializer.class)
@@ -82,11 +83,10 @@ public abstract class BaseEntity<T extends Model<?>> extends Model<T> implements
 
   @Schema(description = "状态，0：禁用，1：启用")
   @TableField("status")
-  private Integer status;
+  private StatusEnum status;
 
-  @Schema(description = "逻辑删除", hidden = true)
+  @Schema(description = "逻辑删除,0 没有删除 1 已经删除", hidden = true)
   @TableField("deleted")
-  // 逻辑删除 默认效果 0 没有删除 1 已经删除
   @TableLogic
-  private Integer deleted;
+  private DeletedEnum deleted;
 }

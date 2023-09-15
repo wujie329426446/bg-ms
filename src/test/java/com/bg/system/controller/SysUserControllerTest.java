@@ -1,11 +1,13 @@
 package com.bg.system.controller;
 
 import com.alibaba.fastjson2.JSONObject;
-import com.bg.system.entity.SysDept;
-import com.bg.system.param.DeptPageParam;
-import com.bg.system.service.ISysDeptService;
+import com.bg.commons.enums.GenderEnum;
+import com.bg.system.entity.SysUser;
+import com.bg.system.param.UserPageParam;
+import com.bg.system.service.ISysUserService;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -25,20 +27,20 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
  * @ProjectName: bg-ms
  * @Author: jiewus
  * @Description:
- * @Date: 2023/9/13 15:44
+ * @Date: 2023/9/14 14:58
  */
 @SpringBootTest
 @Slf4j
-public class SysDeptControllerTest extends Assertions {
+public class SysUserControllerTest {
 
   private MockMvc mvc;
   @InjectMocks
-  private SysDeptController baseController;
+  private SysUserController baseController;
   @Autowired
-  private ISysDeptService baseService;
+  private ISysUserService baseService;
 
   @BeforeEach
-  public void setup() {
+  public void setUp() {
     //通过ReflectionTestUtils注入service
     ReflectionTestUtils.setField(baseController, "baseService", baseService);
 
@@ -52,15 +54,24 @@ public class SysDeptControllerTest extends Assertions {
 
   @Test
   public void save() throws Exception {
-    SysDept sysDept = new SysDept();
-    sysDept.setDeptName("testName041").setDeptCode("testCode041");
-    sysDept.setRemark("test041");
-    sysDept.setParentId("1f5d3d9bdfa4f3cf0aeac05f24417149");
+    SysUser sysUser = new SysUser();
+    sysUser.setUsername("testName001")
+        .setDeptId("80d53ab2edabe878062ee5025359371e")
+        .setAvatar("www.baidu.com/img/PCtm_d9c8750bed0b3c7d089fa7d55720d6cf.png")
+        .setEmail("testEmail002")
+        .setPhone("1234567")
+        .setGender(GenderEnum.MALE)
+        .setNickname("北落师门02")
+        .setRealname("憨憨02")
+        .setRemark("测试账号02");
+    List<String> roleList = new ArrayList<>();
+    roleList.add("db3b2e464b8f11eea1093a31d6d59109");
+    sysUser.setRoleIds(roleList);
 
     RequestBuilder requestBuilder = MockMvcRequestBuilders
-        .post("/dept/add")
+        .post("/user/add")
         .contentType(MediaType.APPLICATION_JSON)
-        .content(JSONObject.toJSONString(sysDept));
+        .content(JSONObject.toJSONString(sysUser));
 
     MvcResult mvcResult = mvc.perform(requestBuilder)
         .andExpect(MockMvcResultMatchers.status().isOk())
@@ -70,15 +81,25 @@ public class SysDeptControllerTest extends Assertions {
 
   @Test
   public void updateById() throws Exception {
-    SysDept sysDept = new SysDept();
-    sysDept.setDeptName("testName02").setDeptCode("testCode002").setParentId("5b823d385b491b33c38c36b05c5abb08");
-    sysDept.setId("f5763e4b26bce83ac15a330fa1d83eac");
-    sysDept.setRemark("remark002");
+    SysUser sysUser = new SysUser();
+    sysUser.setId("a0d35e0bf436fd37d2796caf333ac374");
+    sysUser.setUsername("testName001")
+        .setDeptId("80d53ab2edabe878062ee5025359371e")
+        .setAvatar("www.baidu.com/img/PCtm_d9c8750bed0b3c7d089fa7d55720d6cf.png")
+        .setEmail("testEmail001")
+        .setPhone("123456")
+        .setGender(GenderEnum.MALE)
+        .setNickname("北落师门01")
+        .setRealname("憨憨01")
+        .setRemark("测试账号01");
+    List<String> roleList = new ArrayList<>();
+    roleList.add("f0980292de98d8c5a6d40f26581018b6");
+    sysUser.setRoleIds(roleList);
 
     RequestBuilder requestBuilder = MockMvcRequestBuilders
-        .post("/dept/update")
+        .post("/user/update")
         .contentType(MediaType.APPLICATION_JSON)
-        .content(JSONObject.toJSONString(sysDept));
+        .content(JSONObject.toJSONString(sysUser));
 
     MvcResult mvcResult = mvc.perform(requestBuilder)
         .andExpect(MockMvcResultMatchers.status().isOk())
@@ -87,10 +108,10 @@ public class SysDeptControllerTest extends Assertions {
   }
 
   @Test
-  public void getDeptById() throws Exception {
-    String id = "62e3e55fe284b4c40b88568a0d026036";
+  public void getUserById() throws Exception {
+    String id = "a0d35e0bf436fd37d2796caf333ac374";
     RequestBuilder requestBuilder = MockMvcRequestBuilders
-        .get("/dept/detail")
+        .get("/user/detail")
         .contentType(MediaType.APPLICATION_JSON)
         .queryParam("id", id);
 
@@ -101,10 +122,10 @@ public class SysDeptControllerTest extends Assertions {
   }
 
   @Test
-  public void deleteDept() throws Exception {
-    String id = "1f5d3d9bdfa4f3cf0aeac05f24417149";
+  public void deleteSysUser() throws Exception {
+    String id = "433388b14121e4502094d1f417b75137";
     RequestBuilder requestBuilder = MockMvcRequestBuilders
-        .delete(String.format("/dept/delete/%s", id))
+        .delete(String.format("/user/delete/%s", id))
         .contentType(MediaType.APPLICATION_JSON);
 
     MvcResult mvcResult = mvc.perform(requestBuilder)
@@ -114,13 +135,13 @@ public class SysDeptControllerTest extends Assertions {
   }
 
   @Test
-  public void getDeptPageList() throws Exception {
-    DeptPageParam pageParam = new DeptPageParam();
-    pageParam.setDeptName("01");
-    pageParam.setKeyword("02");
+  public void getUserPageList() throws Exception {
+    UserPageParam pageParam = new UserPageParam();
+//    pageParam.setDeptName("01");
+    pageParam.setKeyword("test");
 
     RequestBuilder requestBuilder = MockMvcRequestBuilders
-        .post("/dept/getPageList")
+        .post("/user/getPageList")
         .contentType(MediaType.APPLICATION_JSON)
         .content(JSONObject.toJSONString(pageParam));
 
@@ -128,34 +149,5 @@ public class SysDeptControllerTest extends Assertions {
         .andExpect(MockMvcResultMatchers.status().isOk())
         .andDo(MockMvcResultHandlers.print()).andReturn();
     log.info("getDeptPageList test result: {}", mvcResult.getResponse().getContentAsString());
-  }
-
-  @Test
-  public void getDeptList() throws Exception {
-    DeptPageParam pageParam = new DeptPageParam();
-//    pageParam.setDeptName("01");
-
-    RequestBuilder requestBuilder = MockMvcRequestBuilders
-        .post("/dept/getList")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(JSONObject.toJSONString(pageParam));
-
-    MvcResult mvcResult = mvc.perform(requestBuilder)
-        .andExpect(MockMvcResultMatchers.status().isOk())
-        .andDo(MockMvcResultHandlers.print()).andReturn();
-    log.info("getDeptList test result: {}", mvcResult.getResponse().getContentAsString());
-
-  }
-
-  @Test
-  public void getDeptTreeList() throws Exception {
-    RequestBuilder requestBuilder = MockMvcRequestBuilders
-        .get("/dept/getTreeList")
-        .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE);
-
-    String result = mvc.perform(requestBuilder)
-        .andExpect(MockMvcResultMatchers.status().isOk())
-        .andDo(MockMvcResultHandlers.print()).andReturn().getResponse().getContentAsString();
-    log.info("getDeptTreeList test result: {}", result);
   }
 }

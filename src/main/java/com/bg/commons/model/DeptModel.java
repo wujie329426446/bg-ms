@@ -1,5 +1,6 @@
 package com.bg.commons.model;
 
+import com.bg.commons.enums.StatusEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serial;
 import java.io.Serializable;
@@ -33,10 +34,7 @@ public class DeptModel implements Serializable {
   private Integer sort;
 
   @Schema(description = "部门状态")
-  private Integer status;
-
-  @Schema(description = "删除标志")
-  private Integer deleted;
+  private StatusEnum status;
 
   @Schema(description = "子部门")
   private List<DeptModel> children;

@@ -1,14 +1,12 @@
 package com.bg.system.vo;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import com.bg.commons.enums.StatusEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.time.LocalDateTime;
-import lombok.Data;
-import lombok.experimental.Accessors;
-
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
+import lombok.Data;
+import lombok.experimental.Accessors;
 
 /**
  * <pre>
@@ -38,7 +36,7 @@ public class SysDeptTreeVo implements Serializable {
   private String parentId;
 
   @Schema(description = "状态，0：禁用，1：启用")
-  private Integer status;
+  private StatusEnum status;
 
   @Schema(description = "排序")
   private Integer sort;

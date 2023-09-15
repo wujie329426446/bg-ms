@@ -16,14 +16,6 @@ import java.util.List;
 public interface SysLogMapper extends BaseMapper<SysLog> {
 
   /**
-   * 系统日志详情
-   *
-   * @param id
-   * @return
-   */
-  SysLogInfoVo getSysLogById(String id);
-
-  /**
    * 系统日志分页列表
    *
    * @param logPageParam

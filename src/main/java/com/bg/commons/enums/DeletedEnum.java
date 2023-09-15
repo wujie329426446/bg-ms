@@ -10,11 +10,11 @@ import lombok.Getter;
  **/
 @Getter
 @AllArgsConstructor
-public enum StatusEnum implements BaseEnum {
+public enum DeletedEnum implements BaseEnum {
 
-  ENABLE(1, "启用"),
+  DELETED(1, "已删除"),
 
-  DISABLE(0, "禁用");
+  NORMAL(0, "未删除");
 
   @JsonValue
   @EnumValue

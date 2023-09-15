@@ -1,52 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.bg.system.mapper.SysMenuMapper">
 
-    <!-- 通用查询结果列 -->
-    <sql id="Base_Column_List">
-        id
-        , menu_name, parent_id, route_path, code, icon, type, level, status, sort, remark, version, create_time, update_time, creator_name, update_name
-    </sql>
-
-    <select id="getSysPermissionById" resultType="com.bg.system.vo.SysPermissionVo">
-        select
-        <include refid="Base_Column_List"/>
-        from sys_menu where id = #{id}
-    </select>
-
-    <select id="getSysPermissionPageList" resultType="com.bg.system.vo.SysPermissionVo">
-        select
-        <include refid="Base_Column_List"/>
-        from sys_menu where deleted = 0 and status = 1
-    </select>
-
-    <select id="getPermissionCodesByUserId" resultType="java.lang.String">
+    <select id="getCodesByUser" resultType="java.lang.String">
         select p.code
         from sys_user u
                  inner join sys_user_role t1 on t1.user_id = u.id and t1.deleted = 0 and t1.status = 1
                  inner join sys_role r on t1.role_id = r.id and r.deleted = 0 and r.status = 1
                  inner join sys_role_menu rp on r.id = rp.role_id and rp.deleted = 0 and rp.status = 1
                  inner join sys_menu p on rp.permission_id = p.id and p.deleted = 0 and p.status = 1
-        where u.id = #{userId};
+        where u.id = #{userId}
+        order by p.create_time desc
     </select>
 
-    <select id="getMenuListByUserId" resultType="com.bg.system.entity.SysMenu">
+    <select id="getMenuListByUser" resultType="com.bg.system.entity.SysMenu">
         select p.*
         from sys_user u
-                 inner join sys_role r on u.role_id = r.id and r.deleted = 0 and r.status = 1
-                 inner join sys_role_menu rp on r.id = rp.role_id and rp.deleted = 0 and rp.status = 1
-                 inner join sys_menu p on rp.permission_id = p.id and p.deleted = 0 and p.status = 1
+                 inner join sys_user_role sur on sur.user_id = u.id and sur.deleted = 0 and sur.status = 1
+                 inner join sys_role r on r.id = sur.role_id and r.deleted = 0 and r.status = 1
+                 inner join sys_role_menu rp on rp.role_id = r.id and rp.deleted = 0 and rp.status = 1
+                 inner join sys_menu p on p.id = rp.permission_id and p.deleted = 0 and p.status = 1
         where u.id = #{userId}
+        order by p.create_time desc
     </select>
 
-    <select id="getThreeLevelPermissionIdsByRoleId" resultType="string">
-        select distinct rp.permission_id
-        from sys_role r
-                 inner join sys_role_menu rp on r.id = rp.role_id and rp.deleted = 0 and rp.status = 1
+    <select id="getMenuListByRole" resultType="com.bg.system.entity.SysMenu">
+        select p.*
+        from sys_role_menu rp
                  inner join sys_menu p on rp.permission_id = p.id and p.deleted = 0 and p.status = 1
-        where r.id = #{roleId}
-          and r.status = 1
+        where rp.role_id = #{roleId} desc
     </select>
 
 </mapper>

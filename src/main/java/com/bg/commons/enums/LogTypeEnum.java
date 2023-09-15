@@ -1,5 +1,7 @@
 package com.bg.commons.enums;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
+import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -11,7 +13,7 @@ import lombok.Getter;
  **/
 @Getter
 @AllArgsConstructor
-public enum SysLogEnum implements BaseEnum {
+public enum LogTypeEnum implements BaseEnum {
 
   OTHER(0, "其它"),
 
@@ -31,6 +33,8 @@ public enum SysLogEnum implements BaseEnum {
 
   UPLOAD(8, "上传文件");
 
+  @JsonValue
+  @EnumValue
   private Integer code;
   private String desc;
 

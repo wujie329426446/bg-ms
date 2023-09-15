@@ -1,5 +1,6 @@
 package com.bg.system.param;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.bg.commons.pagination.BasePageParam;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serial;
@@ -22,5 +23,11 @@ public class MenuPageParam extends BasePageParam {
 
   @Serial
   private static final long serialVersionUID = 1L;
+
+  @Schema(description = "菜单名称")
+  private String menuName;
+
+  @Schema(description = "唯一编码")
+  private String code;
 
 }

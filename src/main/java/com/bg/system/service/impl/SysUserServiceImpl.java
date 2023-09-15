@@ -16,7 +16,6 @@ import com.bg.system.entity.SysUser;
 import com.bg.system.entity.SysUserRole;
 import com.bg.system.mapper.SysUserMapper;
 import com.bg.system.param.UserPageParam;
-import com.bg.system.service.ISysMenuService;
 import com.bg.system.service.ISysRoleService;
 import com.bg.system.service.ISysUserRoleService;
 import com.bg.system.service.ISysUserService;
@@ -66,7 +65,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     sysUser.setPassword(SecurityUtil.encryptPassword(password));
 
     // 如果头像为空，则设置默认头像
-    if (StringUtils.isBlank(sysUser.getAvatar())) {
+    if (StringUtils.isNotBlank(bgProperties.getLoginInitHead()) && StringUtils.isBlank(sysUser.getAvatar())) {
       sysUser.setAvatar(bgProperties.getLoginInitHead());
     }
 

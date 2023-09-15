@@ -1,5 +1,6 @@
 package com.bg.system.vo;
 
+import com.bg.commons.enums.LoginTypeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
 import lombok.Data;
@@ -48,7 +49,7 @@ public class SysLogInfoVo implements Serializable {
   private String requestIp;
 
   @Schema(description = "0:访问日志,1:新增,2:修改,3:删除,4:详情,5:所有列表,6:分页列表,7:其它查询,8:上传文件,9:登录,10:退出")
-  private Integer logType;
+  private LoginTypeEnum logType;
 
   @Schema(description = "响应时间")
   private String responseTime;
