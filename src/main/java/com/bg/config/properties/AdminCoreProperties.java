@@ -15,7 +15,7 @@ import java.util.List;
 @Data
 @Component
 @ConfigurationProperties("bg")
-public class BgProperties {
+public class AdminCoreProperties {
 
   /**
    * 项目IP或域名地址
@@ -42,13 +42,13 @@ public class BgProperties {
    * 拦截器配置
    */
   @NestedConfigurationProperty
-  private BgInterceptorProperties interceptor;
+  private InterceptorProperties interceptor;
 
   /**
    * 过滤器配置
    */
   @NestedConfigurationProperty
-  private BgFilterProperties filter;
+  private FilterProperties filter;
 
   /**
    * 上传目录
@@ -78,6 +78,6 @@ public class BgProperties {
    * 跨域配置
    */
   @NestedConfigurationProperty
-  private BgCorsProperties cors = new BgCorsProperties();
+  private CorsProperties cors = new CorsProperties();
 
 }

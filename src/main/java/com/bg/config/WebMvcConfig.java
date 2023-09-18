@@ -2,7 +2,7 @@ package com.bg.config;
 
 import com.bg.commons.constant.UploadsPrefix;
 import com.bg.config.properties.ApiPrefixProperties;
-import com.bg.config.properties.BgProperties;
+import com.bg.config.properties.AdminCoreProperties;
 import com.bg.config.properties.XssProperties;
 import com.bg.framework.filter.JsonRequestBodyFilter;
 import com.bg.framework.filter.TraceIdLogFilter;
@@ -27,14 +27,14 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
 
-  private final BgProperties bgProperties;
+  private final AdminCoreProperties adminCoreProperties;
 
   private final XssProperties xssProperties;
 
   private final ApiPrefixProperties apiPrefixProperties;
 
-  public WebMvcConfig(BgProperties bgProperties, XssProperties xssProperties, ApiPrefixProperties apiPrefixProperties) {
-    this.bgProperties = bgProperties;
+  public WebMvcConfig(AdminCoreProperties adminCoreProperties, XssProperties xssProperties, ApiPrefixProperties apiPrefixProperties) {
+    this.adminCoreProperties = adminCoreProperties;
     this.xssProperties = xssProperties;
     this.apiPrefixProperties = apiPrefixProperties;
   }
@@ -48,7 +48,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
   @Override
   public void addResourceHandlers(ResourceHandlerRegistry registry) {
-    registry.addResourceHandler(UploadsPrefix.UPLOADS + "/**").addResourceLocations("file:" + bgProperties.getUploadFolder() + "/");
+    registry.addResourceHandler(UploadsPrefix.UPLOADS + "/**").addResourceLocations("file:" + adminCoreProperties.getUploadFolder() + "/");
   }
 
   @Bean

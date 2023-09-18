@@ -3,7 +3,6 @@ package com.bg.commons.model;
 import com.bg.commons.enums.LoginTypeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import java.io.Serial;
 import java.io.Serializable;
 import lombok.Data;
@@ -27,8 +26,7 @@ public class LoginModel implements Serializable {
   @NotBlank(message = "密码不能为空")
   private String password;
 
-  @Schema(description = "登陆方式")
-  @NotNull(message = "登陆方式不能为空")
+  @Schema(description = "登陆方式", hidden = true)
   private LoginTypeEnum loginType;
 
 }

@@ -17,7 +17,7 @@ import java.util.Set;
 @Component
 @ConfigurationProperties(prefix = "bg.aop")
 // TODO: 2023/6/27 待重构
-public class BgAopProperties {
+public class AopProperties {
 
   /**
    * 请求路径Filter配置

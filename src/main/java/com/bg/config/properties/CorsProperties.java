@@ -17,7 +17,7 @@ import java.util.List;
 @Component
 @ConfigurationProperties(prefix = "bg.cors")
 // TODO: 2023/6/27 待重构
-public class BgCorsProperties {
+public class CorsProperties {
 
   /**
    * 是否启用跨域，默认启用

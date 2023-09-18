@@ -136,7 +136,7 @@ bg:
     # 是否打印请求头
     print-head-log: false
     # 登录页面路径
-    login-url: /v1/api/admin/auth/login
+    login-url: /v1/api/admin/login
     # 排除路径
     excludePaths:
       - /sysLog/**
@@ -311,7 +311,7 @@ bg:
 # token 配置
 token:
   # 令牌自定义标识
-  header: Bg-Authorization
+  header: Authorization
   # 令牌密钥 Create by https://www.allkeysgenerator.com/Random/Security-Encryption-Key-Generator.aspx 256-bit with Hex
   secret: 556A586E3272357538782F413F4428472D4B6150645367566B59703373367639
   # 时间颗粒度

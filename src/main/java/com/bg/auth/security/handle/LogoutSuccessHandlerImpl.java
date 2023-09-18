@@ -9,11 +9,11 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.stereotype.Component;
-
-import java.io.IOException;
 
 /**
  * 登出入口
@@ -21,6 +21,7 @@ import java.io.IOException;
  * @author jiewus
  */
 @Component
+@Slf4j
 public class LogoutSuccessHandlerImpl implements LogoutSuccessHandler {
 
   private final TokenService tokenService;
@@ -43,6 +44,7 @@ public class LogoutSuccessHandlerImpl implements LogoutSuccessHandler {
     ObjectMapper objectMapper = new ObjectMapper();
     ObjectWriter objectWriter = objectMapper.writer().withDefaultPrettyPrinter();
     String json = objectWriter.writeValueAsString(apiResult);
+    log.info("{} 登出成功.", userModel.getUsername());
     ServletUtil.renderString(response, json);
   }
 

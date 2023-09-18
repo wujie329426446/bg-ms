@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 @Component
 @ConfigurationProperties(prefix = "bg.filter")
 // TODO: 2023/6/27 待重构
-public class BgFilterProperties {
+public class FilterProperties {
 
   /**
    * RequestDetail Filter配置

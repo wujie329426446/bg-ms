@@ -13,7 +13,7 @@ import jakarta.annotation.PostConstruct;
 @Slf4j
 @Data
 @Component
-public class BgStaticProperties {
+public class StaticProperties {
 
   public static String INFO_PROJECT_VERSION = "";
 

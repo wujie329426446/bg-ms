@@ -10,7 +10,7 @@ import com.bg.commons.api.ApiCode;
 import com.bg.commons.exception.BusinessException;
 import com.bg.commons.utils.PhoneUtil;
 import com.bg.commons.utils.SecurityUtil;
-import com.bg.config.properties.BgProperties;
+import com.bg.config.properties.AdminCoreProperties;
 import com.bg.system.convert.SysUserConvertMapper;
 import com.bg.system.entity.SysUser;
 import com.bg.system.entity.SysUserRole;
@@ -44,7 +44,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> implements ISysUserService {
 
-  private final BgProperties bgProperties;
+  private final AdminCoreProperties adminCoreProperties;
   private final ISysUserRoleService ISysUserRoleService;
   private final ISysRoleService ISysRoleService;
   private final SysUserConvertMapper sysUserConvertMapper;
@@ -59,14 +59,14 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     String password = sysUser.getPassword();
     // 如果密码为空，则设置默认密码
     if (StringUtils.isBlank(password)) {
-      password = bgProperties.getLoginInitPassword();
+      password = adminCoreProperties.getLoginInitPassword();
     }
     // 密码加密
     sysUser.setPassword(SecurityUtil.encryptPassword(password));
 
     // 如果头像为空，则设置默认头像
-    if (StringUtils.isNotBlank(bgProperties.getLoginInitHead()) && StringUtils.isBlank(sysUser.getAvatar())) {
-      sysUser.setAvatar(bgProperties.getLoginInitHead());
+    if (StringUtils.isNotBlank(adminCoreProperties.getLoginInitHead()) && StringUtils.isBlank(sysUser.getAvatar())) {
+      sysUser.setAvatar(adminCoreProperties.getLoginInitHead());
     }
 
     boolean insert = sysUser.insert();
@@ -170,7 +170,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 
   @Override
   public SysUserVo selectUserByUsername(String username) {
-    return baseMapper.selectUserByUsername(username);
+    SysUser one = this.getOne(Wrappers.lambdaQuery(SysUser.class).eq(SysUser::getUsername, username));
+    return sysUserConvertMapper.toDto(one);
   }
 
 }

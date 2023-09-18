@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 @Component
 @ConfigurationProperties(prefix = "bg.interceptor")
 // TODO: 2023/6/27 待重构
-public class BgInterceptorProperties {
+public class InterceptorProperties {
 
   /**
    * SpringBootAdmin权限拦截器

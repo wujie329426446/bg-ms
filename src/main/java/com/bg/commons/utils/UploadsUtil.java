@@ -2,7 +2,7 @@ package com.bg.commons.utils;
 
 import com.bg.commons.constant.UploadsPrefix;
 import com.bg.commons.exception.BusinessException;
-import com.bg.config.properties.BgProperties;
+import com.bg.config.properties.AdminCoreProperties;
 import java.io.File;
 import java.io.IOException;
 import java.util.Objects;
@@ -18,7 +18,7 @@ public class UploadsUtil {
   private UploadsUtil() {
   }
 
-  private static final BgProperties BG_PROPERTIES = SpringUtil.getBean(BgProperties.class);
+  private static final AdminCoreProperties BG_PROPERTIES = SpringUtil.getBean(AdminCoreProperties.class);
 
   /**
    * 文件名最大长度

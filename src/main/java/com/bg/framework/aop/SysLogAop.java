@@ -243,7 +243,7 @@ public class SysLogAop {
           sysLog.setResponseSuccess(success);
           sysLog.setResponseCode(apiResult.getCode());
           sysLog.setResponseMessage(apiResult.getMessage());
-          Object responseData = apiResult.getData();
+          Object responseData = apiResult.getResult();
           if (responseData != null) {
             String responseDataString = JSON.toJSONString(responseData);
             sysLog.setResponseData(responseDataString);

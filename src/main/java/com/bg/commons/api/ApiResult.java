@@ -57,7 +57,7 @@ public class ApiResult<T> implements Serializable {
       description = "响应结果数据",
       accessMode = AccessMode.READ_ONLY
   )
-  private T data;
+  private T result;
 
   @Schema(description = "响应时间")
   @JSONField(format = "yyyy-MM-dd HH:mm:ss")
@@ -141,7 +141,7 @@ public class ApiResult<T> implements Serializable {
     return ApiResult.builder()
         .code(apiCode.getCode())
         .message(outMessage)
-        .data(data)
+        .result(data)
         .success(success)
         .time(new Date())
         .traceId(traceId)
