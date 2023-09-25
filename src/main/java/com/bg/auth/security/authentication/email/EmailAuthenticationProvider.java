@@ -1,4 +1,4 @@
-package com.bg.auth.security.authentication.username;
+package com.bg.auth.security.authentication.email;
 
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.bg.auth.exception.LoginException;
@@ -7,7 +7,6 @@ import com.bg.commons.enums.LoginTypeEnum;
 import com.bg.commons.enums.StatusEnum;
 import com.bg.commons.model.UserModel;
 import com.bg.commons.utils.RedisUtil;
-import com.bg.commons.utils.SecurityUtil;
 import com.bg.commons.utils.SpringUtil;
 import com.bg.commons.utils.VerificationCode;
 import com.bg.system.vo.SysUserVo;
@@ -19,15 +18,12 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Component;
 
 /**
- * 用户名密码身份验证
- *
- * @author jiewus
+ * @Author: jiewus
+ * @Description: 邮箱登录provider类
+ * @Date: 2023/9/25 10:00
  */
 @Component
-public class UsernameAuthenticationProvider implements AuthenticationProvider {
-
-  public UsernameAuthenticationProvider() {
-  }
+public class EmailAuthenticationProvider implements AuthenticationProvider {
 
   @Override
   public Authentication authenticate(Authentication authentication) throws AuthenticationException {
@@ -36,42 +32,38 @@ public class UsernameAuthenticationProvider implements AuthenticationProvider {
     }
     IAuthService authService = SpringUtil.getBean(IAuthService.class);
 
-    UsernameAuthenticationToken authenticationToken = (UsernameAuthenticationToken) authentication;
-    String username = authenticationToken.getPrincipal().toString();
-    String password = authenticationToken.getCredentials().toString();
-    String verifyCode = authenticationToken.getVerifyCode().toString();
-    String verifyCodeCacheKey = authenticationToken.getVerifyCodeCacheKey().toString();
+    EmailAuthenticationToken authenticationToken = (EmailAuthenticationToken) authentication;
+    String email = authenticationToken.getPrincipal().toString();
+    String emailCode = authenticationToken.getVerifyCode().toString();
+    String emailCodeCacheKey = authenticationToken.getVerifyCodeCacheKey().toString();
 
-    SysUserVo user = authService.loadUserByUsername(username);
+    SysUserVo user = authService.loadUserByEmail(email);
     if (Objects.isNull(user)) {
       throw new LoginException("account does not exist");
-    }
-    if (!SecurityUtil.matchesPassword(password, user.getPassword())) {
-      throw new LoginException("password error");
     }
     if (user.getStatus().equals(StatusEnum.DISABLE)) {
       throw new LoginException("account has been deactivated");
     }
     // 验证码校验
     RedisUtil redisUtil = SpringUtil.getBean(RedisUtil.class);
-    String verifyCodeCache = (String) redisUtil.get(VerificationCode.getUsernamePasswordCode(verifyCodeCacheKey));
-    if (StringUtils.isEmpty(verifyCodeCache)) {
+    String emailCodeCache = (String) redisUtil.get(VerificationCode.getEmailCode(emailCodeCacheKey));
+    if (StringUtils.isEmpty(emailCodeCache)) {
       throw new LoginException("the verification code has expired, please reapply");
     }
-    if (!verifyCodeCache.equalsIgnoreCase(verifyCode)) {
+    if (!emailCodeCache.equalsIgnoreCase(emailCode)) {
       throw new LoginException("verification code error!");
     }
 
-    UserModel userModel = authService.createUserModel(user, username, LoginTypeEnum.USER_NAME);
+    UserModel userModel = authService.createUserModel(user, email, LoginTypeEnum.EMAIL);
 
-    authenticationToken = new UsernameAuthenticationToken(userModel, Collections.emptyList());
+    authenticationToken = new EmailAuthenticationToken(userModel, Collections.emptyList());
 
     return authenticationToken;
   }
 
   @Override
   public boolean supports(Class<?> authentication) {
-    return UsernameAuthenticationToken.class.isAssignableFrom(authentication);
+    return EmailAuthenticationToken.class.isAssignableFrom(authentication);
   }
 
 }

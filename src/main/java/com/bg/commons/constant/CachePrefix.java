@@ -18,6 +18,11 @@ public interface CachePrefix {
   String LOGIN_TOKENS = SYSTEM + "login_tokens:";
 
   /**
+   * 用户密码登录验证码前缀
+   */
+  String USERNAME_CODE = "USERNAME_CODE:";
+
+  /**
    * 用户邮箱登录验证码前缀
    */
   String EMAIL_CODE = "EMAIL_CODE:";

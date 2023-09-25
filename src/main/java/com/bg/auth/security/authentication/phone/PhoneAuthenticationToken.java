@@ -1,15 +1,15 @@
-package com.bg.auth.security.authentication.username;
+package com.bg.auth.security.authentication.phone;
 
 import java.util.Collection;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 
 /**
- * 用户名密码身份令牌
- *
- * @author jiewus
+ * @Author: jiewus
+ * @Description: 手机登录token类
+ * @Date: 2023/9/25 9:53
  */
-public class UsernameAuthenticationToken extends AbstractAuthenticationToken {
+public class PhoneAuthenticationToken extends AbstractAuthenticationToken {
 
   @java.io.Serial
   private static final long serialVersionUID = 5746900743403374870L;
@@ -22,7 +22,7 @@ public class UsernameAuthenticationToken extends AbstractAuthenticationToken {
 
   private final transient Object verifyCodeCacheKey;
 
-  public UsernameAuthenticationToken(Object principal, Object credentials) {
+  public PhoneAuthenticationToken(Object principal, Object credentials) {
     super(null);
     this.principal = principal;
     this.credentials = credentials;
@@ -31,16 +31,16 @@ public class UsernameAuthenticationToken extends AbstractAuthenticationToken {
     setAuthenticated(false);
   }
 
-  public UsernameAuthenticationToken(Object principal, Object credentials, Object verifyCode, Object verifyCodeCacheKey) {
+  public PhoneAuthenticationToken(Object principal, Object verifyCode, Object verifyCodeCacheKey) {
     super(null);
     this.principal = principal;
-    this.credentials = credentials;
+    this.credentials = null;
     this.verifyCode = verifyCode;
     this.verifyCodeCacheKey = verifyCodeCacheKey;
     setAuthenticated(false);
   }
 
-  public UsernameAuthenticationToken(Object principal, Collection<? extends GrantedAuthority> authorities) {
+  public PhoneAuthenticationToken(Object principal, Collection<? extends GrantedAuthority> authorities) {
     super(authorities);
     this.principal = principal;
     this.credentials = null;

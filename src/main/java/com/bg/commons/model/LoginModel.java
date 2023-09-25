@@ -21,7 +21,7 @@ public class LoginModel implements Serializable {
   @Serial
   private static final long serialVersionUID = -5428882047565357006L;
 
-  @Schema(description = "用户名/邮箱/手机")
+  @Schema(description = "用户名")
   @NotBlank(message = "账号不能为空", groups = UsernamePasswordLogin.class)
   private String username;
 
@@ -33,17 +33,17 @@ public class LoginModel implements Serializable {
   @NotBlank(message = "邮箱不能为空", groups = EmailLogin.class)
   private String email;
 
-  @Schema(description = "邮箱验证码")
-  @NotBlank(message = "邮箱验证码不能为空", groups = EmailLogin.class)
-  private String emailCode;
-
   @Schema(description = "手机")
   @NotBlank(message = "手机不能为空", groups = PhoneLogin.class)
   private String phone;
 
-  @Schema(description = "手机验证码")
-  @NotBlank(message = "手机验证码不能为空", groups = PhoneLogin.class)
-  private String phoneCode;
+  @Schema(description = "验证码")
+  @NotBlank(message = "验证码不能为空", groups = {EmailLogin.class, PhoneLogin.class})
+  private String verifyCode;
+
+  @Schema(description = "验证码id")
+  @NotBlank(message = "验证码id不能为空", groups = {EmailLogin.class, PhoneLogin.class})
+  private String verifyUUID;
 
   @Schema(description = "登陆方式", hidden = true)
   private LoginTypeEnum loginType;

@@ -1,6 +1,6 @@
 package com.bg.config;
 
-import com.bg.auth.security.authentication.email.EmailVerificationCodeAuthenticationProvider;
+import com.bg.auth.security.authentication.email.EmailAuthenticationProvider;
 import com.bg.auth.security.authentication.username.UsernameAuthenticationProvider;
 import com.bg.auth.security.filter.JwtAuthenticationTokenFilter;
 import java.util.List;
@@ -47,9 +47,8 @@ public class SecurityConfig {
         // 设置未登陆过滤器
         .exceptionHandling(handling -> handling.authenticationEntryPoint(authenticationEntryPoint))
         .authorizeHttpRequests(authorize -> authorize
-            .requestMatchers("/v1/api/admin/login").permitAll()
-            .requestMatchers("/v1/api/admin/emailLogin").permitAll()
-            .requestMatchers("/v1/api/admin/phoneLogin").permitAll()
+            .requestMatchers("/v1/api/admin/login", "/v1/api/admin/emailLogin", "/v1/api/admin/phoneLogin").permitAll()
+            .requestMatchers("/v1/api/admin/verify").permitAll()
             .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/doc.html", "/webjars/**").permitAll()
             .anyRequest().authenticated()
         )
@@ -59,7 +58,7 @@ public class SecurityConfig {
   }
 
   @Bean
-  public AuthenticationManager authenticationManager(UsernameAuthenticationProvider usernameAuthenticationProvider, EmailVerificationCodeAuthenticationProvider emailAuthenticationProvider) {
+  public AuthenticationManager authenticationManager(UsernameAuthenticationProvider usernameAuthenticationProvider, EmailAuthenticationProvider emailAuthenticationProvider) {
     List<AuthenticationProvider> providers = List.of(usernameAuthenticationProvider, emailAuthenticationProvider);
     return new ProviderManager(providers);
   }
