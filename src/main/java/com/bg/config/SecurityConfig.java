@@ -1,9 +1,11 @@
 package com.bg.config;
 
+import com.bg.auth.security.authentication.email.EmailVerificationCodeAuthenticationProvider;
+import com.bg.auth.security.authentication.username.UsernameAuthenticationProvider;
 import com.bg.auth.security.filter.JwtAuthenticationTokenFilter;
+import java.util.List;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.ProviderManager;
@@ -20,8 +22,6 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 
-import java.util.List;
-
 /**
  * Spring Security 配置
  *
@@ -33,8 +33,10 @@ import java.util.List;
 public class SecurityConfig {
 
   @Bean
-  public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity, AuthenticationEntryPoint authenticationEntryPoint,
-      JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter, LogoutSuccessHandler logoutSuccessHandler) throws Exception {
+  public SecurityFilterChain securityFilterChain(
+      HttpSecurity httpSecurity, AuthenticationEntryPoint authenticationEntryPoint,
+      JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter,
+      LogoutSuccessHandler logoutSuccessHandler) throws Exception {
     return httpSecurity
         // 禁用 CSRF
         .csrf(AbstractHttpConfigurer::disable)
@@ -46,6 +48,8 @@ public class SecurityConfig {
         .exceptionHandling(handling -> handling.authenticationEntryPoint(authenticationEntryPoint))
         .authorizeHttpRequests(authorize -> authorize
             .requestMatchers("/v1/api/admin/login").permitAll()
+            .requestMatchers("/v1/api/admin/emailLogin").permitAll()
+            .requestMatchers("/v1/api/admin/phoneLogin").permitAll()
             .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/doc.html", "/webjars/**").permitAll()
             .anyRequest().authenticated()
         )
@@ -55,7 +59,7 @@ public class SecurityConfig {
   }
 
   @Bean
-  public AuthenticationManager authenticationManager(AuthenticationProvider usernameAuthenticationProvider, AuthenticationProvider emailAuthenticationProvider) {
+  public AuthenticationManager authenticationManager(UsernameAuthenticationProvider usernameAuthenticationProvider, EmailVerificationCodeAuthenticationProvider emailAuthenticationProvider) {
     List<AuthenticationProvider> providers = List.of(usernameAuthenticationProvider, emailAuthenticationProvider);
     return new ProviderManager(providers);
   }

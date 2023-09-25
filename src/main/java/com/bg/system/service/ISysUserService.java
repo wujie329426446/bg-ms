@@ -30,13 +30,4 @@ public interface ISysUserService extends IService<SysUser> {
    */
   Page<SysUserVo> getUserPageList(UserPageParam pageParam);
 
-  /**
-   * 根据用户名查询单条数据
-   *
-   * @param username 用户名
-   * @return 用户对象
-   */
-  SysUserVo selectUserByUsername(String username);
-
-
 }

@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.bg.commons.api.ApiCode;
+import com.bg.commons.enums.StatusEnum;
 import com.bg.commons.exception.BusinessException;
 import com.bg.commons.utils.PhoneUtil;
 import com.bg.commons.utils.SecurityUtil;
@@ -166,12 +167,6 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
       });
     }
     return page;
-  }
-
-  @Override
-  public SysUserVo selectUserByUsername(String username) {
-    SysUser one = this.getOne(Wrappers.lambdaQuery(SysUser.class).eq(SysUser::getUsername, username));
-    return sysUserConvertMapper.toDto(one);
   }
 
 }

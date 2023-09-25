@@ -70,6 +70,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 public class SysLogAop {
 
   private static final String USERNAME = "username";
+  private static final String EMAIL = "email";
+  private static final String PHONE = "phone";
   private static final String REFERER = "Referer";
   private static final String USER_AGENT = "User-Agent";
   private static final String ORIGIN = "Origin";
@@ -490,13 +492,17 @@ public class SysLogAop {
    */
   private void handleLoginUser(SysLog sysLog, String requestUrl, String requestBodyString) throws Exception {
     try {
-      String loginUrl = logAopProperties.getLoginUrl();
-      if (requestUrl.equals(loginUrl)) {
+      List<String> loginUrls = logAopProperties.getLoginUrls();
+//      String loginUrl = logAopProperties.getLoginUrl();
+      if (loginUrls.contains(requestUrl)) {
         // 获取请求参数中的用户名称
         if (StringUtils.isNotBlank(requestBodyString)) {
           JSONObject jsonObject = JSON.parseObject(requestBodyString);
           String username = jsonObject.getString(USERNAME);
-          sysLog.setUserName(username);
+          String email = jsonObject.getString(EMAIL);
+          String phone = jsonObject.getString(PHONE);
+
+          sysLog.setUserName(StringUtils.isNotBlank(username) ? username : (StringUtils.isNotBlank(email) ? email : phone));
         }
       } else {
         sysLog.setUserId(SecurityUtil.getUser().getUserId());

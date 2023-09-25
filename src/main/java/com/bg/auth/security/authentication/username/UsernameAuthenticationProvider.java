@@ -1,16 +1,19 @@
 package com.bg.auth.security.authentication.username;
 
-import com.bg.auth.service.authentication.AuthenticationService;
+import com.bg.auth.exception.LoginException;
+import com.bg.auth.service.LoginService;
 import com.bg.commons.enums.LoginTypeEnum;
+import com.bg.commons.enums.StatusEnum;
 import com.bg.commons.model.UserModel;
-import com.bg.system.service.ISysUserService;
+import com.bg.commons.utils.SecurityUtil;
+import com.bg.commons.utils.SpringUtil;
 import com.bg.system.vo.SysUserVo;
+import java.util.Collections;
+import java.util.Objects;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Component;
-
-import java.util.Collections;
 
 /**
  * 用户名密码身份验证
@@ -20,13 +23,7 @@ import java.util.Collections;
 @Component
 public class UsernameAuthenticationProvider implements AuthenticationProvider {
 
-  private final ISysUserService userService;
-
-  private final AuthenticationService authenticationService;
-
-  public UsernameAuthenticationProvider(ISysUserService userService, AuthenticationService authenticationService) {
-    this.userService = userService;
-    this.authenticationService = authenticationService;
+  public UsernameAuthenticationProvider() {
   }
 
   @Override
@@ -34,16 +31,24 @@ public class UsernameAuthenticationProvider implements AuthenticationProvider {
     if (!supports(authentication.getClass())) {
       return null;
     }
+    LoginService loginService = SpringUtil.getBean(LoginService.class);
+
     UsernameAuthenticationToken authenticationToken = (UsernameAuthenticationToken) authentication;
     String username = authenticationToken.getPrincipal().toString();
     String password = authenticationToken.getCredentials().toString();
 
-    SysUserVo user = userService.selectUserByUsername(username);
+    SysUserVo user = loginService.loadUserByUsername(username);
+    if (Objects.isNull(user)) {
+      throw new LoginException("account does not exist");
+    }
+    if (!SecurityUtil.matchesPassword(password, user.getPassword())) {
+      throw new LoginException("password error");
+    }
+    if (user.getStatus().equals(StatusEnum.DISABLE)) {
+      throw new LoginException("account has been deactivated");
+    }
 
-    // TODO: 2023/6/26 这里登录方式以后增加邮件
-    UserModel userModel = null;
-
-    userModel = authenticationService.createUserModel(user, password, username, LoginTypeEnum.USER_NAME);
+    UserModel userModel = loginService.createUserModel(user, password, username, LoginTypeEnum.USER_NAME);
 
     authenticationToken = new UsernameAuthenticationToken(userModel, Collections.emptyList());
 

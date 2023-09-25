@@ -88,6 +88,7 @@ spring:
           # 连接池中的最小空闲连接
           min-idle: 10
         shutdown-timeout: 3s
+
 # logback.xml中有详细的日志配置
 logging:
   config: classpath:logback.xml
@@ -136,7 +137,10 @@ bg:
     # 是否打印请求头
     print-head-log: false
     # 登录页面路径
-    login-url: /v1/api/admin/login
+    login-urls:
+      - /v1/api/admin/login
+      - /v1/api/admin/emailLogin
+      - /v1/api/admin/phoneLogin
     # 排除路径
     excludePaths:
       - /sysLog/**
@@ -239,11 +243,6 @@ spring:
           name: ${spring.application.name}
           # client ip端口
           service-base-url: http://${bg.server-ip}:${server.port}
-      monitor:
-        period: 100000
-        status-lifetime: 100000
-        connect-timeout: 100000
-        read-timeout: 100000
 
 # 开启和暴露端点
 management:

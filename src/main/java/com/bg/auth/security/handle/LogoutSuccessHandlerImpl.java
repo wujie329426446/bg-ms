@@ -1,6 +1,6 @@
 package com.bg.auth.security.handle;
 
-import com.bg.auth.service.TokenService;
+import com.bg.auth.security.filter.JwtAuthenticationTokenHandler;
 import com.bg.commons.api.ApiResult;
 import com.bg.commons.model.UserModel;
 import com.bg.commons.utils.ServletUtil;
@@ -24,10 +24,10 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class LogoutSuccessHandlerImpl implements LogoutSuccessHandler {
 
-  private final TokenService tokenService;
+  private final JwtAuthenticationTokenHandler jwtAuthenticationTokenHandler;
 
-  public LogoutSuccessHandlerImpl(TokenService tokenService) {
-    this.tokenService = tokenService;
+  public LogoutSuccessHandlerImpl(JwtAuthenticationTokenHandler jwtAuthenticationTokenHandler) {
+    this.jwtAuthenticationTokenHandler = jwtAuthenticationTokenHandler;
   }
 
   /**
@@ -35,9 +35,9 @@ public class LogoutSuccessHandlerImpl implements LogoutSuccessHandler {
    */
   @Override
   public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-    UserModel userModel = tokenService.get(request);
+    UserModel userModel = jwtAuthenticationTokenHandler.get(request);
     if (userModel != null) {
-      tokenService.delete(userModel.getToken());
+      jwtAuthenticationTokenHandler.delete(userModel.getToken());
     }
 
     ApiResult apiResult = ApiResult.success("登出成功");

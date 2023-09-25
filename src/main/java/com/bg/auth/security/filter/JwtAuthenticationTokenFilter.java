@@ -1,12 +1,13 @@
 package com.bg.auth.security.filter;
 
 import com.bg.auth.security.authentication.username.UsernameAuthenticationToken;
-import com.bg.auth.service.TokenService;
 import com.bg.commons.model.UserModel;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -23,20 +24,17 @@ import java.util.Collections;
  * @author jiewus
  */
 @Component
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
 
-  private final TokenService tokenService;
-
-  public JwtAuthenticationTokenFilter(TokenService tokenService) {
-    this.tokenService = tokenService;
-  }
+  private final JwtAuthenticationTokenHandler jwtAuthenticationTokenHandler;
 
   @Override
   protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
-    UserModel userModel = tokenService.get(request);
+    UserModel userModel = jwtAuthenticationTokenHandler.get(request);
 
     if (userModel != null) {
-      tokenService.verifyToken(userModel);
+      jwtAuthenticationTokenHandler.verifyToken(userModel);
 
       AbstractAuthenticationToken authenticationToken;
       authenticationToken = new UsernameAuthenticationToken(userModel, Collections.emptyList());

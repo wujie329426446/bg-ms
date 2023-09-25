@@ -1,14 +1,13 @@
 package com.bg.config.properties;
 
 import com.bg.commons.constant.CommonConstant;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import lombok.Data;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * @author jiewus
@@ -30,7 +29,7 @@ public class LogAopProperties {
   /**
    * 登录路径
    */
-  private String loginUrl = "/login";
+  private List<String> loginUrls;
 
   /**
    * 是否打印请求头日志
@@ -60,6 +59,26 @@ public class LogAopProperties {
       this.excludePaths = excludePathList;
     } else {
       this.excludePaths = excludePaths;
+    }
+  }
+
+  public void setLoginUrls(List<String> loginUrls) {
+    if (CollectionUtils.isNotEmpty(loginUrls)) {
+      List<String> loginUrlList = new ArrayList<>();
+      for (String loginUrl : loginUrls) {
+        if (StringUtils.isBlank(loginUrl)) {
+          continue;
+        }
+        if (loginUrl.contains(CommonConstant.COMMA)) {
+          String[] excludeArray = loginUrl.split(CommonConstant.COMMA);
+          loginUrlList.addAll(Arrays.asList(excludeArray));
+        } else {
+          loginUrlList.add(loginUrl);
+        }
+      }
+      this.loginUrls = loginUrlList;
+    } else {
+      this.loginUrls = loginUrls;
     }
   }
 

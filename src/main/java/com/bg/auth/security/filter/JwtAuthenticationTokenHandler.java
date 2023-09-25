@@ -1,15 +1,15 @@
-package com.bg.auth.service;
+package com.bg.auth.security.filter;
 
 import cn.hutool.http.useragent.UserAgent;
 import cn.hutool.http.useragent.UserAgentUtil;
 import com.bg.commons.constant.CachePrefix;
+import com.bg.commons.model.UserModel;
 import com.bg.commons.utils.IdUtil;
 import com.bg.commons.utils.IpRegionUtil;
 import com.bg.commons.utils.IpUtil;
 import com.bg.commons.utils.RedisUtil;
 import com.bg.commons.utils.ServletUtil;
 import com.bg.config.properties.TokenProperties;
-import com.bg.commons.model.UserModel;
 import com.bg.system.entity.SysUser;
 import com.bg.system.mapper.SysUserMapper;
 import io.jsonwebtoken.Claims;
@@ -17,15 +17,16 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.lang.NonNull;
-import org.springframework.stereotype.Component;
-
-import javax.crypto.SecretKey;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import javax.crypto.SecretKey;
+import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.NonNull;
+import org.springframework.stereotype.Component;
 
 /**
  * token 验证处理
@@ -33,7 +34,8 @@ import java.util.Map;
  * @author jiewus
  */
 @Component
-public class TokenService {
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
+public class JwtAuthenticationTokenHandler {
 
   private static final String LOGIN_USER_KEY = "login_user_key";
 
@@ -44,12 +46,6 @@ public class TokenService {
   private final TokenProperties tokenProperties;
 
   private final SysUserMapper userMapper;
-
-  public TokenService(RedisUtil redisUtil, TokenProperties tokenProperties, SysUserMapper userMapper) {
-    this.redisUtil = redisUtil;
-    this.tokenProperties = tokenProperties;
-    this.userMapper = userMapper;
-  }
 
   /**
    * 获取登陆用户身份信息

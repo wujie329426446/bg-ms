@@ -63,6 +63,7 @@
         <mysql.version>8.0.33</mysql.version>
         <guava.version>32.1.1-jre</guava.version>
         <spring-boot-maven-plugin.version>3.1.2</spring-boot-maven-plugin.version>
+        <spring-boot-admin.version>3.1.2</spring-boot-admin.version>
     </properties>
 
     <dependencies>
@@ -169,6 +170,26 @@
             <scope>test</scope>
         </dependency>
         <!-- spring-boot end -->
+
+        <!-- spring boot admin start-->
+        <!-- actuator 监控中心 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <!-- server -->
+<!--        <dependency>-->
+<!--            <groupId>de.codecentric</groupId>-->
+<!--            <artifactId>spring-boot-admin-starter-server</artifactId>-->
+<!--            <version>${spring-boot-admin.version}</version>-->
+<!--        </dependency>-->
+        <!-- admin -->
+        <dependency>
+            <groupId>de.codecentric</groupId>
+            <artifactId>spring-boot-admin-starter-client</artifactId>
+            <version>${spring-boot-admin.version}</version>
+        </dependency>
+        <!-- spring boot admin end-->
 
         <!-- ini格式处理 -->
         <dependency>

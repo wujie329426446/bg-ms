@@ -3,13 +3,15 @@ package com.bg.auth.controller;
 import com.bg.auth.service.LoginService;
 import com.bg.commons.api.ApiResult;
 import com.bg.commons.constant.LoginConstant;
+import com.bg.commons.core.validator.groups.login.EmailLogin;
+import com.bg.commons.core.validator.groups.login.PhoneLogin;
+import com.bg.commons.core.validator.groups.login.UsernamePasswordLogin;
 import com.bg.commons.enums.LoginTypeEnum;
 import com.bg.commons.model.LoginModel;
 import com.bg.commons.model.UserModel;
 import com.bg.commons.utils.SecurityUtil;
 import com.bg.framework.prefix.AdminApiRestController;
 import com.bg.system.service.ISysMenuService;
-import com.bg.system.service.ISysUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -40,7 +42,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class LoginController {
 
-  private final ISysUserService sysUserService;
   private final ISysMenuService sysMenuService;
   private final LoginService loginService;
 
@@ -58,8 +59,48 @@ public class LoginController {
           }
       )
   )
-  public ApiResult login(@Validated @RequestBody LoginModel loginModel) {
+  public ApiResult accountLogin(@Validated(UsernamePasswordLogin.class) @RequestBody LoginModel loginModel) {
     loginModel.setLoginType(LoginTypeEnum.USER_NAME);
+    String token = loginService.login(loginModel);
+    return ApiResult.success(Map.of("token", token));
+  }
+
+  @PostMapping("/emailLogin")
+  @Operation(
+      summary = "登录(邮箱登录)",
+      requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+          description = "请求体描述",
+          required = true,
+          content = {
+              @Content(
+                  mediaType = MediaType.APPLICATION_JSON_VALUE,
+                  schema = @Schema(implementation = LoginModel.class)
+              )
+          }
+      )
+  )
+  public ApiResult emailLogin(@Validated(EmailLogin.class) @RequestBody LoginModel loginModel) {
+    loginModel.setLoginType(LoginTypeEnum.EMAIL);
+    String token = loginService.login(loginModel);
+    return ApiResult.success(Map.of("token", token));
+  }
+
+  @PostMapping("/phoneLogin")
+  @Operation(
+      summary = "登录(手机登录)",
+      requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+          description = "请求体描述",
+          required = true,
+          content = {
+              @Content(
+                  mediaType = MediaType.APPLICATION_JSON_VALUE,
+                  schema = @Schema(implementation = LoginModel.class)
+              )
+          }
+      )
+  )
+  public ApiResult phoneLogin(@Validated(PhoneLogin.class) @RequestBody LoginModel loginModel) {
+    loginModel.setLoginType(LoginTypeEnum.PHONE);
     String token = loginService.login(loginModel);
     return ApiResult.success(Map.of("token", token));
   }
