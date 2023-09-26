@@ -64,6 +64,7 @@
         <guava.version>32.1.1-jre</guava.version>
         <spring-boot-maven-plugin.version>3.1.2</spring-boot-maven-plugin.version>
         <spring-boot-admin.version>3.1.2</spring-boot-admin.version>
+        <easy-captcha.version>1.6.2</easy-captcha.version>
     </properties>
 
     <dependencies>
@@ -191,6 +192,12 @@
         </dependency>
         <!-- spring boot admin end-->
 
+        <!-- easy captcha -->
+        <dependency>
+            <groupId>com.github.whvcse</groupId>
+            <artifactId>easy-captcha</artifactId>
+            <version>${easy-captcha.version}</version>
+        </dependency>
         <!-- ini格式处理 -->
         <dependency>
             <groupId>org.ini4j</groupId>

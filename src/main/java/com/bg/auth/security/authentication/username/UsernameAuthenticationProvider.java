@@ -9,7 +9,7 @@ import com.bg.commons.model.UserModel;
 import com.bg.commons.utils.RedisUtil;
 import com.bg.commons.utils.SecurityUtil;
 import com.bg.commons.utils.SpringUtil;
-import com.bg.commons.utils.VerificationCode;
+import com.bg.commons.utils.VerifyCodeUtil;
 import com.bg.system.vo.SysUserVo;
 import java.util.Collections;
 import java.util.Objects;
@@ -54,7 +54,7 @@ public class UsernameAuthenticationProvider implements AuthenticationProvider {
     }
     // 验证码校验
     RedisUtil redisUtil = SpringUtil.getBean(RedisUtil.class);
-    String verifyCodeCache = (String) redisUtil.get(VerificationCode.getUsernamePasswordCode(verifyCodeCacheKey));
+    String verifyCodeCache = (String) redisUtil.get(VerifyCodeUtil.getUsernamePasswordCode(verifyCodeCacheKey));
     if (StringUtils.isEmpty(verifyCodeCache)) {
       throw new LoginException("the verification code has expired, please reapply");
     }

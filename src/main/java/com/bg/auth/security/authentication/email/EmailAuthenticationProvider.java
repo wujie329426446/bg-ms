@@ -8,7 +8,7 @@ import com.bg.commons.enums.StatusEnum;
 import com.bg.commons.model.UserModel;
 import com.bg.commons.utils.RedisUtil;
 import com.bg.commons.utils.SpringUtil;
-import com.bg.commons.utils.VerificationCode;
+import com.bg.commons.utils.VerifyCodeUtil;
 import com.bg.system.vo.SysUserVo;
 import java.util.Collections;
 import java.util.Objects;
@@ -46,7 +46,7 @@ public class EmailAuthenticationProvider implements AuthenticationProvider {
     }
     // 验证码校验
     RedisUtil redisUtil = SpringUtil.getBean(RedisUtil.class);
-    String emailCodeCache = (String) redisUtil.get(VerificationCode.getEmailCode(emailCodeCacheKey));
+    String emailCodeCache = (String) redisUtil.get(VerifyCodeUtil.getEmailCode(emailCodeCacheKey));
     if (StringUtils.isEmpty(emailCodeCache)) {
       throw new LoginException("the verification code has expired, please reapply");
     }

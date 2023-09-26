@@ -9,7 +9,7 @@ import com.bg.commons.enums.StatusEnum;
 import com.bg.commons.model.UserModel;
 import com.bg.commons.utils.RedisUtil;
 import com.bg.commons.utils.SpringUtil;
-import com.bg.commons.utils.VerificationCode;
+import com.bg.commons.utils.VerifyCodeUtil;
 import com.bg.system.vo.SysUserVo;
 import java.util.Collections;
 import java.util.Objects;
@@ -47,7 +47,7 @@ public class PhoneAuthenticationProvider implements AuthenticationProvider {
     }
     // 验证码校验
     RedisUtil redisUtil = SpringUtil.getBean(RedisUtil.class);
-    String phoneCodeCache = (String) redisUtil.get(VerificationCode.getEmailCode(phoneCodeCacheKey));
+    String phoneCodeCache = (String) redisUtil.get(VerifyCodeUtil.getPhoneCode(phoneCodeCacheKey));
     if (StringUtils.isEmpty(phoneCodeCache)) {
       throw new LoginException("the verification code has expired, please reapply");
     }

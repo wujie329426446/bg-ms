@@ -1,5 +1,6 @@
 package com.bg.auth.controller;
 
+import com.bg.auth.service.IAuthService;
 import com.bg.auth.service.impl.AuthServiceImpl;
 import com.bg.commons.api.ApiResult;
 import com.bg.commons.constant.LoginConstant;
@@ -20,7 +21,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
@@ -47,7 +47,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class AuthController {
 
   private final ISysMenuService sysMenuService;
-  private final AuthServiceImpl authServiceImpl;
+  private final IAuthService authService;
 
 
   @GetMapping("/verify")
@@ -68,8 +68,8 @@ public class AuthController {
           )
       }
   )
-  public ApiResult<Map<String, String>> verify() throws IOException {
-    Map<String, String> result = authServiceImpl.verify();
+  public ApiResult<Map<String, String>> verify() {
+    Map<String, String> result = authService.verify();
     return ApiResult.success(result);
   }
 
@@ -100,7 +100,7 @@ public class AuthController {
       }
   )
   public ApiResult<Map<String, String>> emailVerify(@RequestParam String email) {
-    Map<String, String> result = authServiceImpl.emailVerify(email);
+    Map<String, String> result = authService.emailVerify(email);
     return ApiResult.success(result);
   }
 
@@ -131,7 +131,7 @@ public class AuthController {
       }
   )
   public ApiResult<Map<String, String>> phoneVerify(@RequestParam String phone) {
-    Map<String, String> result = authServiceImpl.phoneVerify(phone);
+    Map<String, String> result = authService.phoneVerify(phone);
     return ApiResult.success(result);
   }
 
@@ -151,7 +151,7 @@ public class AuthController {
   )
   public ApiResult<String> accountLogin(@Validated(UsernamePasswordLogin.class) @RequestBody LoginModel loginModel) {
     loginModel.setLoginType(LoginTypeEnum.USER_NAME);
-    String token = authServiceImpl.login(loginModel);
+    String token = authService.login(loginModel);
     return ApiResult.success(Map.of("token", token));
   }
 
@@ -171,7 +171,7 @@ public class AuthController {
   )
   public ApiResult<String> emailLogin(@Validated(EmailLogin.class) @RequestBody LoginModel loginModel) {
     loginModel.setLoginType(LoginTypeEnum.EMAIL);
-    String token = authServiceImpl.login(loginModel);
+    String token = authService.login(loginModel);
     return ApiResult.success(Map.of("token", token));
   }
 
@@ -191,7 +191,7 @@ public class AuthController {
   )
   public ApiResult<String> phoneLogin(@Validated(PhoneLogin.class) @RequestBody LoginModel loginModel) {
     loginModel.setLoginType(LoginTypeEnum.PHONE);
-    String token = authServiceImpl.login(loginModel);
+    String token = authService.login(loginModel);
     return ApiResult.success(Map.of("token", token));
   }
 

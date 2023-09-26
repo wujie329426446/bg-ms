@@ -21,7 +21,7 @@ public interface IAuthService {
    * @return
    * @throws IOException
    */
-  Map<String, String> verify() throws IOException;
+  Map<String, String> verify();
 
   /**
    * 邮箱登录-获取验证码

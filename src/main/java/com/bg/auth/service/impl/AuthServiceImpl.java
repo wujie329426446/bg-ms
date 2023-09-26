@@ -14,7 +14,7 @@ import com.bg.commons.model.RoleModel;
 import com.bg.commons.model.SysUserModel;
 import com.bg.commons.model.UserModel;
 import com.bg.commons.utils.RedisUtil;
-import com.bg.commons.utils.VerificationCode;
+import com.bg.commons.utils.VerifyCodeUtil;
 import com.bg.system.convert.SysUserConvertMapper;
 import com.bg.system.entity.SysUser;
 import com.bg.system.service.ISysLogLoginService;
@@ -24,10 +24,7 @@ import com.bg.system.service.ISysUserService;
 import com.bg.system.vo.SysRoleVo;
 import com.bg.system.vo.SysUserVo;
 import com.google.common.collect.Maps;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.Base64;
+import com.wf.captcha.SpecCaptcha;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +32,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-import javax.imageio.ImageIO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -66,23 +62,18 @@ public class AuthServiceImpl implements IAuthService {
   private final RedisUtil redisUtil;
 
   @Override
-  public Map<String, String> verify() throws IOException {
-    VerificationCode code = new VerificationCode();
+  public Map<String, String> verify() {
+    SpecCaptcha specCaptcha = new SpecCaptcha(130, 48, 5);
     // 生成图片验证码
-    BufferedImage image = code.getImage();
-    ByteArrayOutputStream out = new ByteArrayOutputStream();//字节数组输出流
-    ImageIO.write(image, "png", out);//png 为要保存的图片格式
-    String base64 = "data:image/png;base64," + Base64.getEncoder().encodeToString(out.toByteArray());
-
+    String verCode = specCaptcha.text().toLowerCase();
     // 将验证码存储到缓存中，1分钟有效期
-    String codeText = code.getText();
     String uuid = UUID.randomUUID().toString();
-    String usernamePasswordCode = VerificationCode.getUsernamePasswordCode(uuid);
-    redisUtil.set(usernamePasswordCode, codeText, 1, TimeUnit.MINUTES);
+    String usernamePasswordCode = VerifyCodeUtil.getUsernamePasswordCode(uuid);
+    redisUtil.set(usernamePasswordCode, verCode, 5, TimeUnit.MINUTES);
 
     HashMap<String, String> map = Maps.newHashMap();
     map.put("verifyUUID", uuid);
-    map.put("verifyCodeImg", base64);
+    map.put("verifyCodeImg", specCaptcha.toBase64());
     return map;
   }
 
@@ -178,7 +169,7 @@ public class AuthServiceImpl implements IAuthService {
 
   @Override
   public UserModel createUserModel(SysUserVo user, String account, LoginTypeEnum loginType) {
-    UserModel userModel = new UserModel();
+    UserModel userModel = jwtAuthenticationTokenHandler.getUserAgent();
     // 用户对象
     SysUserModel sysUserModel = new SysUserModel();
     BeanUtils.copyProperties(user, sysUserModel);
