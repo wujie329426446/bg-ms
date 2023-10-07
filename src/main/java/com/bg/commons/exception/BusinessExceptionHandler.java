@@ -1,5 +1,6 @@
 package com.bg.commons.exception;
 
+import com.bg.auth.exception.LoginException;
 import com.bg.commons.api.ApiCode;
 import com.bg.commons.api.ApiResult;
 import java.util.List;
@@ -21,6 +22,12 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @Slf4j
 @RestControllerAdvice
 public class BusinessExceptionHandler {
+
+  @ExceptionHandler(LoginException.class)
+  public ApiResult<?> loginExceptionHandler(LoginException e) {
+    log.error(e.getMessage(), e);
+    return ApiResult.fail(e.getCode(), e.getMessage());
+  }
 
   @ExceptionHandler(BusinessException.class)
   public ApiResult<?> businessExceptionHandler(BusinessException e) {

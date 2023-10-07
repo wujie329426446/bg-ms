@@ -49,7 +49,7 @@ public enum ApiCode {
 
   HTTP_REQUEST_METHOD_NOT_SUPPORTED_EXCEPTION(5108, "METHOD NOT SUPPORTED"),
 
-  TOKEN_EXCEPTION(5109, "Token为空或已过期，请重新登录");;
+  TOKEN_EXCEPTION(5109, "Token为空或已过期，请重新登录");
 
   private final int code;
   private final String message;

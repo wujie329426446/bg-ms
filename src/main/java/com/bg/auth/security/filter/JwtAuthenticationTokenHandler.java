@@ -3,7 +3,7 @@ package com.bg.auth.security.filter;
 import cn.hutool.http.useragent.UserAgent;
 import cn.hutool.http.useragent.UserAgentUtil;
 import com.bg.commons.constant.CachePrefix;
-import com.bg.commons.model.UserModel;
+import com.bg.commons.model.LoginModel;
 import com.bg.commons.utils.IdUtil;
 import com.bg.commons.utils.IpRegionUtil;
 import com.bg.commons.utils.IpUtil;
@@ -53,7 +53,7 @@ public class JwtAuthenticationTokenHandler {
    * @param request request
    * @return 登陆用户信息
    */
-  public UserModel get(@NonNull HttpServletRequest request) {
+  public LoginModel get(@NonNull HttpServletRequest request) {
     // 获取请求携带的令牌
     String token = getToken(request);
     if (StringUtils.isNotEmpty(token)) {
@@ -61,8 +61,8 @@ public class JwtAuthenticationTokenHandler {
       // 解析对应的权限以及登陆用户信息
       String uuid = (String) claims.get(LOGIN_USER_KEY);
       String userKey = getTokenKey(uuid);
-      UserModel userModel = (UserModel) redisUtil.get(userKey);
-      return userModel;
+      LoginModel loginModel = (LoginModel) redisUtil.get(userKey);
+      return loginModel;
     }
     return null;
   }
@@ -82,14 +82,14 @@ public class JwtAuthenticationTokenHandler {
   /**
    * 创建令牌
    *
-   * @param userModel 登陆用户信息
+   * @param loginModel 登陆用户信息
    * @return 令牌
    */
-  public String createToken(@NonNull UserModel userModel) {
+  public String createToken(@NonNull LoginModel loginModel) {
     String token = String.valueOf(IdUtil.snowflake());
-    userModel.setToken(token);
-    setUserAgent(userModel);
-    set(userModel);
+    loginModel.setToken(token);
+    setUserAgent(loginModel);
+    set(loginModel);
     HashMap<String, Object> claims = new HashMap<String, Object>(16);
     claims.put(LOGIN_USER_KEY, token);
     return createToken(claims);
@@ -98,54 +98,54 @@ public class JwtAuthenticationTokenHandler {
   /**
    * 设置登陆用户身份信息
    *
-   * @param userModel 登陆用户信息
+   * @param loginModel 登陆用户信息
    */
-  public void set(@NonNull UserModel userModel) {
-    if (StringUtils.isNotEmpty(userModel.getToken())) {
-      refreshToken(userModel);
+  public void set(@NonNull LoginModel loginModel) {
+    if (StringUtils.isNotEmpty(loginModel.getToken())) {
+      refreshToken(loginModel);
     }
   }
 
   /**
    * 验证令牌有效期
    *
-   * @param userModel 登陆用户信息
+   * @param loginModel 登陆用户信息
    */
-  public void verifyToken(@NonNull UserModel userModel) {
-    refreshToken(userModel);
+  public void verifyToken(@NonNull LoginModel loginModel) {
+    refreshToken(loginModel);
   }
 
   /**
    * 刷新令牌有效期
    *
-   * @param userModel 登陆用户信息
+   * @param loginModel 登陆用户信息
    */
-  public void refreshToken(@NonNull UserModel userModel) {
-    userModel.setExpireTime(LocalDateTime.now().plus(Duration.ofMillis(tokenProperties.getExpireTimeLong())));
+  public void refreshToken(@NonNull LoginModel loginModel) {
+    loginModel.setExpireTime(LocalDateTime.now().plus(Duration.ofMillis(tokenProperties.getExpireTimeLong())));
     // 缓存登陆信息
-    String userKey = getTokenKey(userModel.getToken());
-    redisUtil.set(userKey, userModel, tokenProperties.getExpireTime(), tokenProperties.getTimeUnit());
+    String userKey = getTokenKey(loginModel.getToken());
+    redisUtil.set(userKey, loginModel, tokenProperties.getExpireTime(), tokenProperties.getTimeUnit());
   }
 
   /**
    * 设置登陆用户代理信息
    *
-   * @param userModel 登陆用户信息
+   * @param loginModel 登陆用户信息
    */
-  public void setUserAgent(@NonNull UserModel userModel) {
+  public void setUserAgent(@NonNull LoginModel loginModel) {
     UserAgent userAgent = UserAgentUtil.parse(ServletUtil.getRequest().getHeader("User-Agent"));
-    userModel.setIp(IpUtil.getRequestIp(ServletUtil.getRequest()));
-    userModel.setLocation(IpRegionUtil.getIpRegion(userModel.getIp()).getCity());
-    userModel.setMobile(userAgent.isMobile());
-    userModel.setBrowser(userAgent.getBrowser().getName());
-    userModel.setVersion(userAgent.getVersion());
-    userModel.setPlatform(userAgent.getPlatform().getName());
-    userModel.setOs(userAgent.getOs().getName());
-    userModel.setOsVersion(userAgent.getOsVersion());
-    userModel.setEngine(userAgent.getEngine().getName());
-    userModel.setEngineVersion(userAgent.getEngineVersion());
-    userModel.setLoginTime(LocalDateTime.now());
-    updateUserLoginInfo(userModel);
+    loginModel.setIp(IpUtil.getRequestIp(ServletUtil.getRequest()));
+    loginModel.setLocation(IpRegionUtil.getIpRegion(loginModel.getIp()).getCity());
+    loginModel.setMobile(userAgent.isMobile());
+    loginModel.setBrowser(userAgent.getBrowser().getName());
+    loginModel.setVersion(userAgent.getVersion());
+    loginModel.setPlatform(userAgent.getPlatform().getName());
+    loginModel.setOs(userAgent.getOs().getName());
+    loginModel.setOsVersion(userAgent.getOsVersion());
+    loginModel.setEngine(userAgent.getEngine().getName());
+    loginModel.setEngineVersion(userAgent.getEngineVersion());
+    loginModel.setLoginTime(LocalDateTime.now());
+    updateUserLoginInfo(loginModel);
   }
 
   /**
@@ -153,33 +153,33 @@ public class JwtAuthenticationTokenHandler {
    *
    * @return 登陆用户信息
    */
-  public UserModel getUserAgent() {
-    UserModel userModel = new UserModel();
+  public LoginModel getUserAgent() {
+    LoginModel loginModel = new LoginModel();
     UserAgent userAgent = UserAgentUtil.parse(ServletUtil.getRequest().getHeader("User-Agent"));
-    userModel.setIp(IpUtil.getRequestIp(ServletUtil.getRequest()));
-    userModel.setLocation(IpRegionUtil.getIpRegion((userModel.getIp())).getCity());
-    userModel.setMobile(userAgent.isMobile());
-    userModel.setBrowser(userAgent.getBrowser().getName());
-    userModel.setVersion(userAgent.getVersion());
-    userModel.setPlatform(userAgent.getPlatform().getName());
-    userModel.setOs(userAgent.getOs().getName());
-    userModel.setOsVersion(userAgent.getOsVersion());
-    userModel.setEngine(userAgent.getEngine().getName());
-    userModel.setEngineVersion(userAgent.getEngineVersion());
-    userModel.setLoginTime(LocalDateTime.now());
-    return userModel;
+    loginModel.setIp(IpUtil.getRequestIp(ServletUtil.getRequest()));
+    loginModel.setLocation(IpRegionUtil.getIpRegion((loginModel.getIp())).getCity());
+    loginModel.setMobile(userAgent.isMobile());
+    loginModel.setBrowser(userAgent.getBrowser().getName());
+    loginModel.setVersion(userAgent.getVersion());
+    loginModel.setPlatform(userAgent.getPlatform().getName());
+    loginModel.setOs(userAgent.getOs().getName());
+    loginModel.setOsVersion(userAgent.getOsVersion());
+    loginModel.setEngine(userAgent.getEngine().getName());
+    loginModel.setEngineVersion(userAgent.getEngineVersion());
+    loginModel.setLoginTime(LocalDateTime.now());
+    return loginModel;
   }
 
   /**
    * 更新用户登陆信息
    *
-   * @param userModel 登陆用户信息
+   * @param loginModel 登陆用户信息
    */
-  private void updateUserLoginInfo(@NonNull UserModel userModel) {
+  private void updateUserLoginInfo(@NonNull LoginModel loginModel) {
     SysUser user = new SysUser();
-    user.setId(userModel.getUser().getUserId());
-    user.setLoginIp(userModel.getIp());
-    user.setLoginDate(userModel.getLoginTime());
+    user.setId(loginModel.getUser().getId());
+    user.setLoginIp(loginModel.getIp());
+    user.setLoginDate(loginModel.getLoginTime());
     userMapper.updateById(user);
   }
 

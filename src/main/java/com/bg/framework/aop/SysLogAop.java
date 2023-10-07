@@ -505,7 +505,7 @@ public class SysLogAop {
           sysLog.setUserName(StringUtils.isNotBlank(username) ? username : (StringUtils.isNotBlank(email) ? email : phone));
         }
       } else {
-        sysLog.setUserId(SecurityUtil.getUser().getUserId());
+        sysLog.setUserId(SecurityUtil.getUser().getId());
         sysLog.setUserName(SecurityUtil.getUser().getUsername());
       }
     } catch (Exception e) {

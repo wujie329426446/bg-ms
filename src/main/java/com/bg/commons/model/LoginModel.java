@@ -1,51 +1,132 @@
 package com.bg.commons.model;
 
-import com.bg.commons.core.validator.groups.login.EmailLogin;
-import com.bg.commons.core.validator.groups.login.PhoneLogin;
-import com.bg.commons.core.validator.groups.login.UsernamePasswordLogin;
 import com.bg.commons.enums.LoginTypeEnum;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotBlank;
 import java.io.Serial;
-import java.io.Serializable;
 import lombok.Data;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
 /**
- * 登陆模型
+ * 登录用户身份权限
  *
- * @author Tang
+ * @author jiewus
  */
 @Data
-public class LoginModel implements Serializable {
+public class LoginModel implements UserDetails {
 
   @Serial
-  private static final long serialVersionUID = -5428882047565357006L;
+  private static final long serialVersionUID = 1700642694582927208L;
 
-  @Schema(description = "用户名")
-  @NotBlank(message = "账号不能为空", groups = UsernamePasswordLogin.class)
-  private String username;
+  @Schema(description = "ip")
+  private String ip;
 
-  @Schema(description = "密码")
-  @NotBlank(message = "密码不能为空", groups = UsernamePasswordLogin.class)
-  private String password;
+  @Schema(description = "地址")
+  private String location;
 
-  @Schema(description = "邮箱")
-  @NotBlank(message = "邮箱不能为空", groups = EmailLogin.class)
-  private String email;
+  @Schema(description = "是否为移动平台")
+  private boolean isMobile;
 
-  @Schema(description = "手机")
-  @NotBlank(message = "手机不能为空", groups = PhoneLogin.class)
-  private String phone;
+  @Schema(description = "浏览器类型")
+  private String browser;
 
-  @Schema(description = "验证码")
-  @NotBlank(message = "验证码不能为空", groups = {EmailLogin.class, PhoneLogin.class})
-  private String verifyCode;
+  @Schema(description = "浏览器版本")
+  private String version;
 
-  @Schema(description = "验证码id")
-  @NotBlank(message = "验证码id不能为空", groups = {EmailLogin.class, PhoneLogin.class})
-  private String verifyUUID;
+  @Schema(description = "平台类型")
+  private String platform;
 
-  @Schema(description = "登陆方式", hidden = true)
+  @Schema(description = "系统类型")
+  private String os;
+
+  @Schema(description = "系统版本")
+  private String osVersion;
+
+  @Schema(description = "引擎类型")
+  private String engine;
+
+  @Schema(description = "引擎版本")
+  private String engineVersion;
+
+  @Schema(description = "登陆方式")
   private LoginTypeEnum loginType;
+
+  @Schema(description = "登陆时间")
+  @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+  @JsonSerialize(using = LocalDateTimeSerializer.class)
+  @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+  private LocalDateTime loginTime;
+
+  @Schema(description = "过期时间")
+  @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+  @JsonSerialize(using = LocalDateTimeSerializer.class)
+  @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+  private LocalDateTime expireTime;
+
+  @Schema(description = "用户唯一标识")
+  private String token;
+
+  @Schema(description = "角色集合")
+  private List<RoleModel> roles;
+
+  @Schema(description = "权限集合")
+  private Set<String> permissions;
+
+  @Schema(description = "用户信息")
+  private UserModel user;
+
+  @JsonIgnore
+  @Override
+  public Collection<? extends GrantedAuthority> getAuthorities() {
+    return Collections.emptyList();
+  }
+
+  @JsonIgnore
+  @Override
+  public String getPassword() {
+    return user.getPassword();
+  }
+
+  @JsonIgnore
+  @Override
+  public String getUsername() {
+    return user.getUsername();
+  }
+
+  @JsonIgnore
+  @Override
+  public boolean isAccountNonExpired() {
+    return true;
+  }
+
+  @JsonIgnore
+  @Override
+  public boolean isAccountNonLocked() {
+    return true;
+  }
+
+  @JsonIgnore
+  @Override
+  public boolean isCredentialsNonExpired() {
+    return true;
+  }
+
+  @JsonIgnore
+  @Override
+  public boolean isEnabled() {
+    return true;
+  }
 
 }

@@ -3,7 +3,10 @@ package com.bg.config;
 import com.bg.auth.security.authentication.email.EmailAuthenticationProvider;
 import com.bg.auth.security.authentication.username.UsernameAuthenticationProvider;
 import com.bg.auth.security.filter.JwtAuthenticationTokenFilter;
+import com.bg.config.properties.LogAopProperties;
 import java.util.List;
+import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -32,6 +35,9 @@ import org.springframework.security.web.authentication.logout.LogoutSuccessHandl
 @EnableMethodSecurity
 public class SecurityConfig {
 
+  @Autowired
+  private LogAopProperties logAopProperties;
+
   @Bean
   public SecurityFilterChain securityFilterChain(
       HttpSecurity httpSecurity, AuthenticationEntryPoint authenticationEntryPoint,
@@ -46,11 +52,16 @@ public class SecurityConfig {
         .sessionManagement(management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         // 设置未登陆过滤器
         .exceptionHandling(handling -> handling.authenticationEntryPoint(authenticationEntryPoint))
-        .authorizeHttpRequests(authorize -> authorize
-            .requestMatchers("/v1/api/admin/login", "/v1/api/admin/emailLogin", "/v1/api/admin/phoneLogin").permitAll()
-            .requestMatchers("/v1/api/admin/verify").permitAll()
-            .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/doc.html", "/webjars/**").permitAll()
-            .anyRequest().authenticated()
+        .authorizeHttpRequests(authorize -> {
+              // 设置白名单
+              List<String> excludePaths = logAopProperties.getExcludePaths();
+              if (CollectionUtils.isNotEmpty(excludePaths)) {
+                authorize.requestMatchers(excludePaths.toArray(new String[excludePaths.size()])).permitAll();
+              }
+              authorize
+                  .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/doc.html", "/webjars/**").permitAll()
+                  .anyRequest().authenticated();
+            }
         )
         .logout(logout -> logout.logoutUrl("/v1/api/admin/logout").logoutSuccessHandler(logoutSuccessHandler))
         .addFilterBefore(jwtAuthenticationTokenFilter, UsernamePasswordAuthenticationFilter.class)

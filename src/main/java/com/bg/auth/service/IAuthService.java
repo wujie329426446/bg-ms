@@ -2,8 +2,8 @@ package com.bg.auth.service;
 
 import com.bg.commons.enums.LoginTypeEnum;
 import com.bg.commons.model.LoginModel;
-import com.bg.commons.model.UserModel;
-import com.bg.system.vo.SysUserVo;
+import com.bg.commons.model.LoginParam;
+import com.bg.system.entity.SysUser;
 import java.io.IOException;
 import java.util.Map;
 
@@ -43,17 +43,17 @@ public interface IAuthService {
   /**
    * 登录
    *
-   * @param loginModel
+   * @param loginParam
    * @return
    */
-  String login(LoginModel loginModel);
+  String login(LoginParam loginParam);
 
-  SysUserVo loadUserByUsername(String username);
+  SysUser loadUserByUsername(String username);
 
-  SysUserVo loadUserByEmail(String email);
+  SysUser loadUserByEmail(String email);
 
-  SysUserVo loadUserByPhone(String phone);
+  SysUser loadUserByPhone(String phone);
 
-  UserModel createUserModel(SysUserVo user, String account, LoginTypeEnum loginType);
+  LoginModel createUserModel(SysUser user, String account, LoginTypeEnum loginType);
 
 }

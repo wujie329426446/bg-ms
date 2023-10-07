@@ -10,25 +10,25 @@ import com.bg.commons.constant.CommonConstant;
 import com.bg.commons.enums.LoginTypeEnum;
 import com.bg.commons.model.DeptModel;
 import com.bg.commons.model.LoginModel;
+import com.bg.commons.model.LoginParam;
 import com.bg.commons.model.RoleModel;
-import com.bg.commons.model.SysUserModel;
 import com.bg.commons.model.UserModel;
 import com.bg.commons.utils.RedisUtil;
 import com.bg.commons.utils.VerifyCodeUtil;
 import com.bg.system.convert.SysUserConvertMapper;
+import com.bg.system.entity.SysDept;
 import com.bg.system.entity.SysUser;
+import com.bg.system.service.ISysDeptService;
 import com.bg.system.service.ISysLogLoginService;
 import com.bg.system.service.ISysMenuService;
 import com.bg.system.service.ISysRoleService;
 import com.bg.system.service.ISysUserService;
 import com.bg.system.vo.SysRoleVo;
-import com.bg.system.vo.SysUserVo;
 import com.google.common.collect.Maps;
 import com.wf.captcha.SpecCaptcha;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -57,6 +57,7 @@ public class AuthServiceImpl implements IAuthService {
   private final ISysLogLoginService logLoginService;
   private final ISysRoleService roleService;
   private final ISysMenuService menuService;
+  private final ISysDeptService deptService;
   private final ISysUserService sysUserService;
   private final SysUserConvertMapper sysUserConvertMapper;
   private final RedisUtil redisUtil;
@@ -92,22 +93,22 @@ public class AuthServiceImpl implements IAuthService {
   /**
    * 登陆
    *
-   * @param loginModel 登陆用户信息
+   * @param loginParam 登陆用户信息
    * @return token
    */
   @Override
-  public String login(LoginModel loginModel) {
+  public String login(LoginParam loginParam) {
     AbstractAuthenticationToken authenticationToken;
 
-    LoginTypeEnum loginType = loginModel.getLoginType();
+    LoginTypeEnum loginType = loginParam.getLoginType();
     String account = "";
 
     Authentication authentication = switch (loginType) {
       case USER_NAME -> {
-        String username = loginModel.getUsername();
-        String password = loginModel.getPassword();
-        String verifyCode = loginModel.getVerifyCode();
-        String verifyUUID = loginModel.getVerifyUUID();
+        String username = loginParam.getUsername();
+        String password = loginParam.getPassword();
+        String verifyCode = loginParam.getVerifyCode();
+        String verifyUUID = loginParam.getVerifyUUID();
 
         account = username;
         authenticationToken = new UsernameAuthenticationToken(username, password, verifyCode, verifyUUID);
@@ -116,9 +117,9 @@ public class AuthServiceImpl implements IAuthService {
         yield authentication;
       }
       case EMAIL -> {
-        String email = loginModel.getEmail();
-        String verifyCode = loginModel.getVerifyCode();
-        String verifyUUID = loginModel.getVerifyUUID();
+        String email = loginParam.getEmail();
+        String verifyCode = loginParam.getVerifyCode();
+        String verifyUUID = loginParam.getVerifyUUID();
         account = email;
         authenticationToken = new EmailAuthenticationToken(email, verifyCode, verifyUUID);
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
@@ -126,9 +127,9 @@ public class AuthServiceImpl implements IAuthService {
         yield authentication;
       }
       case PHONE -> {
-        String phone = loginModel.getPhone();
-        String verifyCode = loginModel.getVerifyCode();
-        String verifyUUID = loginModel.getVerifyUUID();
+        String phone = loginParam.getPhone();
+        String verifyCode = loginParam.getVerifyCode();
+        String verifyUUID = loginParam.getVerifyUUID();
         account = phone;
         authenticationToken = new PhoneAuthenticationToken(phone, verifyCode, verifyUUID);
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
@@ -137,48 +138,54 @@ public class AuthServiceImpl implements IAuthService {
       }
     };
 
-    UserModel userModel = (UserModel) authentication.getPrincipal();
-    String token = jwtAuthenticationTokenHandler.createToken(userModel);
+    LoginModel loginModel = (LoginModel) authentication.getPrincipal();
+    String token = jwtAuthenticationTokenHandler.createToken(loginModel);
 
-    logLoginService.recordLoginInfo(userModel.getUser().getUserId(), userModel, account, loginType, CommonConstant.SUCCESS_INT, "登陆成功");
+    logLoginService.recordLoginInfo(loginModel.getUser().getId(), loginModel, account, loginType, CommonConstant.SUCCESS_INT, "登陆成功");
     log.info("用户使用 {} 方式登录成功，登录账号：{}", loginType.getDesc(), account);
 
     return token;
   }
 
   @Override
-  public SysUserVo loadUserByUsername(String username) {
+  public SysUser loadUserByUsername(String username) {
     SysUser one = sysUserService.getOne(Wrappers.lambdaQuery(SysUser.class)
         .eq(SysUser::getUsername, username));
-    return sysUserConvertMapper.toDto(one);
+    return one;
   }
 
   @Override
-  public SysUserVo loadUserByEmail(String email) {
+  public SysUser loadUserByEmail(String email) {
     SysUser one = sysUserService.getOne(Wrappers.lambdaQuery(SysUser.class)
         .eq(SysUser::getEmail, email));
-    return sysUserConvertMapper.toDto(one);
+    return one;
   }
 
   @Override
-  public SysUserVo loadUserByPhone(String phone) {
+  public SysUser loadUserByPhone(String phone) {
     SysUser one = sysUserService.getOne(Wrappers.lambdaQuery(SysUser.class)
         .eq(SysUser::getPhone, phone));
-    return sysUserConvertMapper.toDto(one);
+    return one;
   }
 
   @Override
-  public UserModel createUserModel(SysUserVo user, String account, LoginTypeEnum loginType) {
-    UserModel userModel = jwtAuthenticationTokenHandler.getUserAgent();
+  public LoginModel createUserModel(SysUser user, String account, LoginTypeEnum loginType) {
+    LoginModel loginModel = jwtAuthenticationTokenHandler.getUserAgent();
     // 用户对象
-    SysUserModel sysUserModel = new SysUserModel();
-    BeanUtils.copyProperties(user, sysUserModel);
-    if (Objects.nonNull(user.getDept())) {
-      DeptModel deptModel = new DeptModel();
-      BeanUtils.copyProperties(user.getDept(), deptModel);
-      sysUserModel.setDept(deptModel);
-    }
-    sysUserModel.setRoleIds(roleService.getRoleIdsByUserId(user.getId()));
+    UserModel userModel = new UserModel();
+    BeanUtils.copyProperties(user, userModel);
+    // 获取部门信息
+    SysDept sysDept = deptService.getById(user.getDeptId());
+    DeptModel deptModel = new DeptModel();
+    BeanUtils.copyProperties(sysDept, deptModel);
+    userModel.setDept(deptModel);
+
+//    if (Objects.nonNull(user.getDept())) {
+//      DeptModel deptModel = new DeptModel();
+//      BeanUtils.copyProperties(user.getDept(), deptModel);
+//      userModel.setDept(deptModel);
+//    }
+    userModel.setRoleIds(roleService.getRoleIdsByUserId(user.getId()));
 
     // 获取当前用户角色
     List<SysRoleVo> roleList = roleService.getRolesByUserId(user.getId());
@@ -197,11 +204,11 @@ public class AuthServiceImpl implements IAuthService {
     Set<String> permissions = menuService.getCodesByUser(user.getId());
 
     // 将信息放进登陆用户模型
-    userModel.setLoginType(loginType);
-    userModel.setUser(sysUserModel);
-    userModel.setRoles(roleModelList);
-    userModel.setPermissions(permissions);
-    return userModel;
+    loginModel.setLoginType(loginType);
+    loginModel.setUser(userModel);
+    loginModel.setRoles(roleModelList);
+    loginModel.setPermissions(permissions);
+    return loginModel;
   }
 
 }

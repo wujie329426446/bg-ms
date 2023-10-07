@@ -1,8 +1,8 @@
 package com.bg.commons.utils;
 
 import com.bg.commons.model.RoleModel;
-import com.bg.commons.model.SysUserModel;
 import com.bg.commons.model.UserModel;
+import com.bg.commons.model.LoginModel;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
@@ -34,8 +34,8 @@ public class SecurityUtil {
    *
    * @return 登陆用户信息
    */
-  public static UserModel getUserModel() {
-    return (UserModel) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+  public static LoginModel getUserModel() {
+    return (LoginModel) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
   }
 
   /**
@@ -43,7 +43,7 @@ public class SecurityUtil {
    *
    * @return 用户信息
    */
-  public static SysUserModel getUser() {
+  public static UserModel getUser() {
     return getUserModel().getUser();
   }
 

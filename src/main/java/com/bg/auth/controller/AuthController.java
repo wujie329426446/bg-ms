@@ -1,15 +1,14 @@
 package com.bg.auth.controller;
 
 import com.bg.auth.service.IAuthService;
-import com.bg.auth.service.impl.AuthServiceImpl;
 import com.bg.commons.api.ApiResult;
 import com.bg.commons.constant.LoginConstant;
 import com.bg.commons.core.validator.groups.login.EmailLogin;
 import com.bg.commons.core.validator.groups.login.PhoneLogin;
 import com.bg.commons.core.validator.groups.login.UsernamePasswordLogin;
 import com.bg.commons.enums.LoginTypeEnum;
+import com.bg.commons.model.LoginParam;
 import com.bg.commons.model.LoginModel;
-import com.bg.commons.model.UserModel;
 import com.bg.commons.utils.SecurityUtil;
 import com.bg.framework.prefix.AdminApiRestController;
 import com.bg.system.service.ISysMenuService;
@@ -144,14 +143,14 @@ public class AuthController {
           content = {
               @Content(
                   mediaType = MediaType.APPLICATION_JSON_VALUE,
-                  schema = @Schema(implementation = LoginModel.class)
+                  schema = @Schema(implementation = LoginParam.class)
               )
           }
       )
   )
-  public ApiResult<String> accountLogin(@Validated(UsernamePasswordLogin.class) @RequestBody LoginModel loginModel) {
-    loginModel.setLoginType(LoginTypeEnum.USER_NAME);
-    String token = authService.login(loginModel);
+  public ApiResult<String> accountLogin(@Validated(UsernamePasswordLogin.class) @RequestBody LoginParam loginParam) {
+    loginParam.setLoginType(LoginTypeEnum.USER_NAME);
+    String token = authService.login(loginParam);
     return ApiResult.success(Map.of("token", token));
   }
 
@@ -164,14 +163,14 @@ public class AuthController {
           content = {
               @Content(
                   mediaType = MediaType.APPLICATION_JSON_VALUE,
-                  schema = @Schema(implementation = LoginModel.class)
+                  schema = @Schema(implementation = LoginParam.class)
               )
           }
       )
   )
-  public ApiResult<String> emailLogin(@Validated(EmailLogin.class) @RequestBody LoginModel loginModel) {
-    loginModel.setLoginType(LoginTypeEnum.EMAIL);
-    String token = authService.login(loginModel);
+  public ApiResult<String> emailLogin(@Validated(EmailLogin.class) @RequestBody LoginParam loginParam) {
+    loginParam.setLoginType(LoginTypeEnum.EMAIL);
+    String token = authService.login(loginParam);
     return ApiResult.success(Map.of("token", token));
   }
 
@@ -184,14 +183,14 @@ public class AuthController {
           content = {
               @Content(
                   mediaType = MediaType.APPLICATION_JSON_VALUE,
-                  schema = @Schema(implementation = LoginModel.class)
+                  schema = @Schema(implementation = LoginParam.class)
               )
           }
       )
   )
-  public ApiResult<String> phoneLogin(@Validated(PhoneLogin.class) @RequestBody LoginModel loginModel) {
-    loginModel.setLoginType(LoginTypeEnum.PHONE);
-    String token = authService.login(loginModel);
+  public ApiResult<String> phoneLogin(@Validated(PhoneLogin.class) @RequestBody LoginParam loginParam) {
+    loginParam.setLoginType(LoginTypeEnum.PHONE);
+    String token = authService.login(loginParam);
     return ApiResult.success(Map.of("token", token));
   }
 
@@ -207,16 +206,16 @@ public class AuthController {
                   schema = @Schema(
                       title = "ApiResult、UserModel组合模型",
                       description = "返回实体，ApiResult内data为UserModel对象",
-                      anyOf = {ApiResult.class, UserModel.class}
+                      anyOf = {ApiResult.class, LoginModel.class}
                   )
               )
           )
       },
       security = {@SecurityRequirement(name = LoginConstant.BG_HEADER)}
   )
-  public ApiResult<UserModel> getSysUser() {
-    UserModel userModel = SecurityUtil.getUserModel();
-    return ApiResult.success(userModel);
+  public ApiResult<LoginModel> getSysUser() {
+    LoginModel loginModel = SecurityUtil.getUserModel();
+    return ApiResult.success(loginModel);
   }
 
   @GetMapping("/getPermCode")
@@ -239,7 +238,7 @@ public class AuthController {
       security = {@SecurityRequirement(name = LoginConstant.BG_HEADER)}
   )
   public ApiResult<Set<String>> getPermCode() {
-    return ApiResult.success(sysMenuService.getCodesByUser(SecurityUtil.getUser().getUserId()));
+    return ApiResult.success(sysMenuService.getCodesByUser(SecurityUtil.getUser().getId()));
   }
 
 }

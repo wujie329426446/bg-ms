@@ -3,13 +3,14 @@ package com.bg.auth.security.authentication.email;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.bg.auth.exception.LoginException;
 import com.bg.auth.service.IAuthService;
+import com.bg.commons.api.ApiCode;
 import com.bg.commons.enums.LoginTypeEnum;
 import com.bg.commons.enums.StatusEnum;
-import com.bg.commons.model.UserModel;
+import com.bg.commons.model.LoginModel;
 import com.bg.commons.utils.RedisUtil;
 import com.bg.commons.utils.SpringUtil;
 import com.bg.commons.utils.VerifyCodeUtil;
-import com.bg.system.vo.SysUserVo;
+import com.bg.system.entity.SysUser;
 import java.util.Collections;
 import java.util.Objects;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -37,26 +38,26 @@ public class EmailAuthenticationProvider implements AuthenticationProvider {
     String emailCode = authenticationToken.getVerifyCode().toString();
     String emailCodeCacheKey = authenticationToken.getVerifyCodeCacheKey().toString();
 
-    SysUserVo user = authService.loadUserByEmail(email);
+    SysUser user = authService.loadUserByEmail(email);
     if (Objects.isNull(user)) {
-      throw new LoginException("account does not exist");
+      throw new LoginException(ApiCode.LOGIN_EXCEPTION.getCode(), "email does not exist");
     }
     if (user.getStatus().equals(StatusEnum.DISABLE)) {
-      throw new LoginException("account has been deactivated");
+      throw new LoginException(ApiCode.LOGIN_EXCEPTION.getCode(), "email has been deactivated");
     }
     // 验证码校验
     RedisUtil redisUtil = SpringUtil.getBean(RedisUtil.class);
     String emailCodeCache = (String) redisUtil.get(VerifyCodeUtil.getEmailCode(emailCodeCacheKey));
     if (StringUtils.isEmpty(emailCodeCache)) {
-      throw new LoginException("the verification code has expired, please reapply");
+      throw new LoginException(ApiCode.VERIFICATION_CODE_EXCEPTION.getCode(), "the verification code has expired, please reapply");
     }
     if (!emailCodeCache.equalsIgnoreCase(emailCode)) {
-      throw new LoginException("verification code error!");
+      throw new LoginException(ApiCode.VERIFICATION_CODE_EXCEPTION.getCode(), "verification code error!");
     }
 
-    UserModel userModel = authService.createUserModel(user, email, LoginTypeEnum.EMAIL);
+    LoginModel loginModel = authService.createUserModel(user, email, LoginTypeEnum.EMAIL);
 
-    authenticationToken = new EmailAuthenticationToken(userModel, Collections.emptyList());
+    authenticationToken = new EmailAuthenticationToken(loginModel, Collections.emptyList());
 
     return authenticationToken;
   }

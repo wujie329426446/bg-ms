@@ -1,7 +1,7 @@
 package com.bg.auth.security.filter;
 
 import com.bg.auth.security.authentication.username.UsernameAuthenticationToken;
-import com.bg.commons.model.UserModel;
+import com.bg.commons.model.LoginModel;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,13 +31,13 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
 
   @Override
   protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
-    UserModel userModel = jwtAuthenticationTokenHandler.get(request);
+    LoginModel loginModel = jwtAuthenticationTokenHandler.get(request);
 
-    if (userModel != null) {
-      jwtAuthenticationTokenHandler.verifyToken(userModel);
+    if (loginModel != null) {
+      jwtAuthenticationTokenHandler.verifyToken(loginModel);
 
       AbstractAuthenticationToken authenticationToken;
-      authenticationToken = new UsernameAuthenticationToken(userModel, Collections.emptyList());
+      authenticationToken = new UsernameAuthenticationToken(loginModel, Collections.emptyList());
 
       authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
       SecurityContextHolder.getContext().setAuthentication(authenticationToken);

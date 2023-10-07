@@ -4,12 +4,14 @@ import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.bg.auth.exception.LoginException;
 import com.bg.auth.security.authentication.email.EmailAuthenticationToken;
 import com.bg.auth.service.IAuthService;
+import com.bg.commons.api.ApiCode;
 import com.bg.commons.enums.LoginTypeEnum;
 import com.bg.commons.enums.StatusEnum;
-import com.bg.commons.model.UserModel;
+import com.bg.commons.model.LoginModel;
 import com.bg.commons.utils.RedisUtil;
 import com.bg.commons.utils.SpringUtil;
 import com.bg.commons.utils.VerifyCodeUtil;
+import com.bg.system.entity.SysUser;
 import com.bg.system.vo.SysUserVo;
 import java.util.Collections;
 import java.util.Objects;
@@ -38,26 +40,26 @@ public class PhoneAuthenticationProvider implements AuthenticationProvider {
     String phoneCode = authenticationToken.getVerifyCode().toString();
     String phoneCodeCacheKey = authenticationToken.getVerifyCodeCacheKey().toString();
 
-    SysUserVo user = authService.loadUserByPhone(phone);
+    SysUser user = authService.loadUserByPhone(phone);
     if (Objects.isNull(user)) {
-      throw new LoginException("account does not exist");
+      throw new LoginException(ApiCode.LOGIN_EXCEPTION.getCode(), "phone does not exist");
     }
     if (user.getStatus().equals(StatusEnum.DISABLE)) {
-      throw new LoginException("account has been deactivated");
+      throw new LoginException(ApiCode.LOGIN_EXCEPTION.getCode(), "phone has been deactivated");
     }
     // 验证码校验
     RedisUtil redisUtil = SpringUtil.getBean(RedisUtil.class);
     String phoneCodeCache = (String) redisUtil.get(VerifyCodeUtil.getPhoneCode(phoneCodeCacheKey));
     if (StringUtils.isEmpty(phoneCodeCache)) {
-      throw new LoginException("the verification code has expired, please reapply");
+      throw new LoginException(ApiCode.VERIFICATION_CODE_EXCEPTION.getCode(), "the verification code has expired, please reapply");
     }
     if (!phoneCodeCache.equalsIgnoreCase(phoneCode)) {
-      throw new LoginException("verification code error!");
+      throw new LoginException(ApiCode.VERIFICATION_CODE_EXCEPTION.getCode(), "verification code error!");
     }
 
-    UserModel userModel = authService.createUserModel(user, phone, LoginTypeEnum.PHONE);
+    LoginModel loginModel = authService.createUserModel(user, phone, LoginTypeEnum.PHONE);
 
-    authenticationToken = new PhoneAuthenticationToken(userModel, Collections.emptyList());
+    authenticationToken = new PhoneAuthenticationToken(loginModel, Collections.emptyList());
 
     return authenticationToken;
   }

@@ -2,7 +2,7 @@ package com.bg.auth.security.handle;
 
 import com.bg.auth.security.filter.JwtAuthenticationTokenHandler;
 import com.bg.commons.api.ApiResult;
-import com.bg.commons.model.UserModel;
+import com.bg.commons.model.LoginModel;
 import com.bg.commons.utils.ServletUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
@@ -35,16 +35,16 @@ public class LogoutSuccessHandlerImpl implements LogoutSuccessHandler {
    */
   @Override
   public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-    UserModel userModel = jwtAuthenticationTokenHandler.get(request);
-    if (userModel != null) {
-      jwtAuthenticationTokenHandler.delete(userModel.getToken());
+    LoginModel loginModel = jwtAuthenticationTokenHandler.get(request);
+    if (loginModel != null) {
+      jwtAuthenticationTokenHandler.delete(loginModel.getToken());
     }
 
     ApiResult apiResult = ApiResult.success("登出成功");
     ObjectMapper objectMapper = new ObjectMapper();
     ObjectWriter objectWriter = objectMapper.writer().withDefaultPrettyPrinter();
     String json = objectWriter.writeValueAsString(apiResult);
-    log.info("{} 登出成功.", userModel.getUsername());
+    log.info("{} 登出成功.", loginModel.getUsername());
     ServletUtil.renderString(response, json);
   }
 

@@ -2,9 +2,7 @@ package com.bg.auth.controller;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.bg.auth.service.IAuthService;
-import com.bg.commons.enums.LoginTypeEnum;
-import com.bg.commons.model.LoginModel;
-import com.bg.system.entity.SysDept;
+import com.bg.commons.model.LoginParam;
 import com.bg.system.service.ISysMenuService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
@@ -77,16 +75,16 @@ class AuthControllerTest extends Assertions {
 
   @Test
   public void accountLogin() throws Exception {
-    LoginModel loginModel = new LoginModel();
-    loginModel.setUsername("bg");
-    loginModel.setPassword("123456");
-    loginModel.setVerifyCode("6mdhw");
-    loginModel.setVerifyUUID("6bacdef9-5577-4736-8e1f-ef4f080f02bd");
+    LoginParam loginParam = new LoginParam();
+    loginParam.setUsername("bg");
+    loginParam.setPassword("123456");
+    loginParam.setVerifyCode("6mdhw");
+    loginParam.setVerifyUUID("6bacdef9-5577-4736-8e1f-ef4f080f02bd");
 
     RequestBuilder requestBuilder = MockMvcRequestBuilders
         .post("/login")
         .contentType(MediaType.APPLICATION_JSON)
-        .content(JSONObject.toJSONString(loginModel));
+        .content(JSONObject.toJSONString(loginParam));
 
     MvcResult mvcResult = mvc.perform(requestBuilder)
         .andExpect(MockMvcResultMatchers.status().isOk())

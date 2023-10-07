@@ -47,7 +47,7 @@ public class LocalFileController {
   @Operation(summary = "删除单个文件")
   public ApiResult<Boolean> upload(@RequestParam("file") String filePath,
       @RequestParam("type") String type) throws Exception {
-    String fileDeletePath = adminCoreProperties.getUploadFolder() + SecurityUtil.getUser().getUserId() + '/' + StringUtils.substringAfterLast(filePath, "/");
+    String fileDeletePath = adminCoreProperties.getUploadFolder() + SecurityUtil.getUser().getId() + '/' + StringUtils.substringAfterLast(filePath, "/");
     log.info("fileDeletePath:{}", fileDeletePath);
     return ApiResult.success(FileUtil.del(fileDeletePath));
   }
@@ -70,7 +70,7 @@ public class LocalFileController {
     log.info("type = " + type);
 
     // 上传文件，返回保存的文件名称
-    String saveFileName = UploadUtil.upload(adminCoreProperties.getUploadFolder() + '/' + SecurityUtil.getUser().getUserId(), multipartFile, originalFilename -> {
+    String saveFileName = UploadUtil.upload(adminCoreProperties.getUploadFolder() + '/' + SecurityUtil.getUser().getId(), multipartFile, originalFilename -> {
 
       // 文件后缀
       String fileExtension = FilenameUtils.getExtension(originalFilename);
@@ -82,7 +82,7 @@ public class LocalFileController {
     });
 
     // 上传成功之后，返回访问路径，请根据实际情况设置
-    String fileAccessPath = adminCoreProperties.getResourceAccessUrl() + SecurityUtil.getUser().getUserId() + '/' + saveFileName;
+    String fileAccessPath = adminCoreProperties.getResourceAccessUrl() + SecurityUtil.getUser().getId() + '/' + saveFileName;
     log.info("fileAccessPath:{}", fileAccessPath);
 
     return ApiResult.success(fileAccessPath);

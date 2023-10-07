@@ -1,5 +1,8 @@
 package com.bg.system.vo;
 
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableLogic;
+import com.bg.commons.enums.DeletedEnum;
 import com.bg.commons.enums.GenderEnum;
 import com.bg.commons.enums.StatusEnum;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -41,8 +44,8 @@ public class SysUserVo implements Serializable {
   @Schema(description = "姓名")
   private String realname;
 
-  @Schema(description = "用户密码")
-  private String password;
+//  @Schema(description = "用户密码")
+//  private String password;
 
   @Schema(description = "用户邮箱")
   private String email;
@@ -94,5 +97,8 @@ public class SysUserVo implements Serializable {
   @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
   @Schema(description = "修改时间")
   private LocalDateTime updateTime;
+
+  @Schema(description = "逻辑删除,0 没有删除 1 已经删除", hidden = true)
+  private DeletedEnum deleted;
 
 }

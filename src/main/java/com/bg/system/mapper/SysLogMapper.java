@@ -3,9 +3,7 @@ package com.bg.system.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.bg.system.entity.SysLog;
 import com.bg.system.param.LogPageParam;
-import com.bg.system.vo.SysLogInfoVo;
 import com.bg.system.vo.SysLogVo;
-
 import java.util.List;
 
 /**

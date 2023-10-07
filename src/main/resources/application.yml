@@ -143,7 +143,10 @@ bg:
       - /v1/api/admin/phoneLogin
     # 排除路径
     excludePaths:
-      - /sysLog/**
+      - /v1/api/admin/login
+      - /v1/api/admin/emailLogin
+      - /v1/api/admin/phoneLogin
+      - /v1/api/admin/verify
   # XSS
   xss:
     # 是否启用，默认禁用
